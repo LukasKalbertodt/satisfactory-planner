@@ -24,7 +24,13 @@ export const initialNodes: AppNode[] = [
         id: 'f',
         type: 'recipe',
         position: { x: -100, y: 350 },
-        data: { recipeId: "aluminum-scrap" },
+        data: { recipeId: "ficsonium-fuel-rod" },
+    },
+    {
+        id: 'g',
+        type: 'recipe',
+        position: { x: -100, y: 550 },
+        data: { recipeId: "encased-uranium-cell" },
     },
 ];
 

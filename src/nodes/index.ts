@@ -32,6 +32,12 @@ export const initialNodes: AppNode[] = [
         position: { x: -100, y: 550 },
         data: { recipeId: "encased-uranium-cell" },
     },
+    {
+        id: 'h',
+        type: 'recipe',
+        position: { x: -100, y: 700 },
+        data: { recipeId: "heavy-encased-frame" },
+    },
 ];
 
 export const nodeTypes = {

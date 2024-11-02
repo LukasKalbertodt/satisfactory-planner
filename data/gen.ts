@@ -66,6 +66,26 @@ const main = async () => {
     const rawRecipes = await Deno.readTextFile('raw-recipes.json');
     const recipes = readRecipes(rawRecipes, items);
 
+    // Check if icons for all parts are available
+    const exists = async (path: string): Promise<boolean> => {
+        try {
+            const stat = await Deno.stat(path);
+            return stat.isFile;
+        } catch (error) {
+            if (error instanceof Deno.errors.NotFound) {
+                return false;
+            }
+            throw error;
+        }
+    };
+    for (const [key, item] of Object.entries(items)) {
+        const iconPath = `../public/icons/parts/${item.id}.avif`;
+        if (!await exists(iconPath)) {
+            console.log(`Icon for '${item.name}' is missing: ${iconPath}`);
+        }
+    }
+
+
     // ----------------------------------
     console.log("Generating output TS files...");
     const stringifyObj = (key: string, obj: unknown) => {

@@ -12,29 +12,31 @@
 
 
 type RawItemId = string;
+type OurItemId = string;
 type RawRecipeId = string;
+type OurRecipeId = string;
 
 type Items = Record<RawItemId, Item>;
 type Item = {
-    id: string;
+    id: OurItemId;
     name: string;
     description: string;
 };
 
 type Recipes = Record<RawRecipeId, Recipe>;
 type Recipe = {
-    id: string,
+    id: OurRecipeId,
     name: string;
     duration: number;
     producedIn: ProductionBuilding;
     alternative: boolean;
     powerRequirements?: [number, number];
     inputs: {
-        item: RawItemId;
+        item: OurItemId;
         amount: number;
     }[],
     outputs: {
-        item: RawItemId;
+        item: OurItemId;
         amount: number;
     }[],
 };
@@ -65,6 +67,18 @@ const main = async () => {
     const items = readItems(rawItems);
     const rawRecipes = await Deno.readTextFile('raw-recipes.json');
     const recipes = readRecipes(rawRecipes, items);
+
+    // Remove items that are not used in any recipes.
+    for (const [rawKey, item] of Object.entries(items)) {
+        const isUsed = Object.values(recipes).some(recipe => {
+            return recipe.inputs.some(input => input.item === item.id)
+                || recipe.outputs.some(output => output.item === item.id);
+        });
+        if (!isUsed) {
+            delete items[rawKey];
+        }
+    }
+
 
     // Check if icons for all parts are available
     const exists = async (path: string): Promise<boolean> => {

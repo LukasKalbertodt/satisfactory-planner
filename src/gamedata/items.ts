@@ -414,10 +414,6 @@ export const ITEMS = {
         "name": "Alien DNA Capsule",
         "description": "Translates organic chemicals into readable alien genetic information.<br>Used for researching alien organisms.<br>Go the extra kilometer! Knowledge is power, and power is just efficiency with fewer steps. Depositing Alien DNA Capsules in the AWESOME Sink provides FICSIT with knowledge, and pioneers with Coupons."
     },
-    "mercer-sphere": { // Desc_WAT2_C
-        "name": "Mercer Sphere",
-        "description": "A weird alien phenomenon. While the sphere appears liquid, it behaves like a solid and does not have any detectable mass. It seems to somehow interact with and have awareness of its environment."
-    },
     "purple-power-slug": { // Desc_Crystal_mk3_C
         "name": "Purple Power Slug",
         "description": "A strange slug radiating a powerful unknown power."
@@ -429,18 +425,6 @@ export const ITEMS = {
     "smokeless-powder": { // Desc_GunpowderMK2_C
         "name": "Smokeless Powder",
         "description": "An explosive powder that is commonly used to produce modern firearms."
-    },
-    "ficsmas-wonder-star": { // Desc_XmasStar_C
-        "name": "FICSMAS Wonder Star",
-        "description": "This special FICSMAS Star signifies FICSIT's productivity all across the universe. It also signifies the fact that you have nearly completed the Holiday Event, so it's time to get back to work."
-    },
-    "ficsmas-ornament-bundle": { // Desc_XmasBallCluster_C
-        "name": "FICSMAS Ornament Bundle",
-        "description": "All the FICSMAS Ornaments smashed together to make even more FICSMAS Decorations!"
-    },
-    "ficsmas-decoration": { // Desc_XmasWreath_C
-        "name": "FICSMAS Decoration",
-        "description": "A decoration used to make decorations. Its use cases are questionable."
     },
     "candy-cane": { // Desc_CandyCane_C
         "name": "Candy Cane",
@@ -454,37 +438,9 @@ export const ITEMS = {
         "name": "FICSMAS Bow",
         "description": "A fancy Bow. Maybe someone could wear this? You certainly can't! What you can do is make parts and decorations from it. Probably."
     },
-    "copper-ficsmas-ornament": { // Desc_XmasBall3_C
-        "name": "Copper FICSMAS Ornament",
-        "description": "Still used for making FICSMAS Decorations."
-    },
-    "iron-ficsmas-ornament": { // Desc_XmasBall4_C
-        "name": "Iron FICSMAS Ornament",
-        "description": "A super special- Nope! Still just used for making FICSMAS Decorations."
-    },
     "ficsmas-tree-branch": { // Desc_XmasBranch_C
         "name": "FICSMAS Tree Branch",
         "description": "A special Tree Branch used to produce parts and buildings during the FICSMAS Event."
-    },
-    "red-ficsmas-ornament": { // Desc_XmasBall1_C
-        "name": "Red FICSMAS Ornament",
-        "description": "Used for making FICSMAS Decorations."
-    },
-    "blue-ficsmas-ornament": { // Desc_XmasBall2_C
-        "name": "Blue FICSMAS Ornament",
-        "description": "Again, used for making FICSMAS Decorations."
-    },
-    "ficsmas-gift": { // Desc_Gift_C
-        "name": "FICSMAS Gift",
-        "description": "Special FICSMAS buildings and parts can be obtained and produced from this FICSIT Holiday present.<br>*Watch the sky for deliveries from orbit!"
-    },
-    "rebar-gun": { // Desc_RebarGunProjectile_C
-        "name": "Rebar Gun",
-        "description": "An improvised ranged weapon for self-defense. Has to be reloaded after each use."
-    },
-    "rifle": { // BP_EquipmentDescriptorRifle_C
-        "name": "Rifle",
-        "description": "A long-range, rapid-fire weapon. Specifically designed to deliver adequate performance within the designated work area."
     },
     "uranium-fuel-rod": { // Desc_NuclearFuelRod_C
         "name": "Uranium Fuel Rod",
@@ -542,73 +498,13 @@ export const ITEMS = {
         "name": "Sparkly Fireworks",
         "description": "Goes Pfffeeeeew... BOOM! *Sparkle*"
     },
-    "snowball": { // Desc_SnowballProjectile_C
-        "name": "Snowball",
-        "description": "Compressed dihydrogen monoxide crystals."
-    },
     "iron-rebar": { // Desc_SpikedRebar_C
         "name": "Iron Rebar",
         "description": "Can be shot using the Rebar Gun for self-defense purposes."
     },
-    "hazmat-suit": { // BP_EquipmentDescriptorHazmatSuit_C
-        "name": "Hazmat Suit",
-        "description": "Shields pioneers from the adverse effects of radiation. <br>Consumes Iodine-Infused Filters from the pioneer's inventory when worn in radioactive areas."
-    },
-    "nobelisk-detonator": { // BP_EquipmentDescriptorNobeliskDetonator_C
-        "name": "Nobelisk Detonator",
-        "description": "A remote-control device used to handle and detonate Nobelisks."
-    },
-    "factory-cart™": { // Desc_GolfCart_C
-        "name": "Factory Cart™",
-        "description": "The one and only FICSIT Factory Cart™.<br>Now with special FICSIT-Foundation-only Grip Wheels, for an even smoother and faster factory floor experience!"
-    },
-    "golden-factory-cart™": { // Desc_GolfCartGold_C
-        "name": "Golden Factory Cart™",
-        "description": "The one and only Golden FICSIT Factory Cart™<br>You have now officially ascended. <br>Go forth now, Master of Spaghetti, God of the Factory, Sinker of Cups, Employee of the Planet... travel in STYLE!"
-    },
     "portable-miner": { // BP_ItemDescriptorPortableMiner_C
         "name": "Portable Miner",
         "description": "Automatically extracts a resource when placed on a resource node.<br>Note: Has limited storage space."
-    },
-    "xeno-zapper": { // BP_EquipmentDescriptorShockShank_C
-        "name": "Xeno-Zapper",
-        "description": "A standard issue self-defense electroshock melee weapon."
-    },
-    "object-scanner": { // BP_EquipmentDescriptorObjectScanner_C
-        "name": "Object Scanner",
-        "description": "Scans the area for a selected item. Beeps at a rate proportional to proximity and direction."
-    },
-    "hoverpack": { // BP_EquipmentDescriptorHoverPack_C
-        "name": "Hoverpack",
-        "description": "Power Consumption: 100 MW<br>Allows pioneers to move vertically and hover in mid-air to improve building efficiency and factory traversal. Wirelessly connects to nearby power connections, such as Power Poles and Buildings, for power consumption.<br>Slow-Fall: Hold {PlayerMovement_Jump} after losing connection mid-air.<br>Disable Hoverpack: Double tap {PlayerMovement_Crouch} while hovering."
-    },
-    "jetpack": { // BP_EquipmentDescriptorJetPack_C
-        "name": "Jetpack",
-        "description": "Allows pioneers to travel through the air with increased control.<br>Fuel is automatically consumed from the pioneer's inventory to refill the Jetpack while on the ground.<br>Different fuel types can be used and provide different levels of Jetpack efficiency. The preferred fuel type will be used if available, and can be set in the equipment inventory."
-    },
-    "xeno-basher": { // BP_EquipmentDescriptorStunSpear_C
-        "name": "Xeno-Basher",
-        "description": "A heavy self-defense electroshock melee weapon."
-    },
-    "chainsaw": { // Desc_Chainsaw_C
-        "name": "Chainsaw",
-        "description": "Clears an area of flora that is too difficult to remove by hand.<br>Fuel: Biofuel"
-    },
-    "blade-runners": { // BP_EquipmentDescriptorJumpingStilts_C
-        "name": "Blade Runners",
-        "description": "An exoskeleton for the lower legs that assists movement, allowing pioneers to sprint faster and jump higher.<br>Also dampens the impact of landing."
-    },
-    "zipline": { // BP_EqDescZipLine_C
-        "name": "Zipline",
-        "description": "Provides faster traversal of factories by allowing pioneers to zip along Power lines.<br>Activate the Zipline and aim at a nearby Power Line to connect to it."
-    },
-    "gas-mask": { // BP_EquipmentDescriptorGasmask_C
-        "name": "Gas Mask",
-        "description": "Allows pioneers to breathe normally in toxic gas-filled areas.<br>Consumes Gas Filters from the pioneer's inventory when in use."
-    },
-    "candy-cane-basher": { // BP_EquipmentDescriptorCandyCane_C
-        "name": "Candy Cane Basher",
-        "description": "A heavy, delicious self-defense weapon for use at melee range."
     },
     "shatter-rebar": { // Desc_Rebar_Spreadshot_C
         "name": "Shatter Rebar",
@@ -673,10 +569,6 @@ export const ITEMS = {
     "crude-oil": { // Desc_LiquidOil_C
         "name": "Crude Oil",
         "description": "Refined into all kinds of Oil-based resources, like Fuel and Plastic."
-    },
-    "medicinal-inhaler": { // Desc_Medkit_C
-        "name": "Medicinal Inhaler",
-        "description": "Fully restores health when used.<br>The FICSIT Medicinal Inhaler can be produced from a variety of different ingredients."
     },
     "solid-biofuel": { // Desc_Biofuel_C
         "name": "Solid Biofuel",
@@ -745,26 +637,6 @@ export const ITEMS = {
     "power-shard": { // Desc_CrystalShard_C
         "name": "Power Shard",
         "description": "Power Slug mucus compressed into a solid crystal-like shard. <br>It radiates a strange power."
-    },
-    "somersloop": { // Desc_WAT1_C
-        "name": "Somersloop",
-        "description": "An odd alien object with a mind-bending, yet somehow familiar shape. It emits an unsettling energy."
-    },
-    "paleberry": { // Desc_Berry_C
-        "name": "Paleberry",
-        "description": "Consumable<br>Eat to restore 1 health segment."
-    },
-    "beryl-nut": { // Desc_Nut_C
-        "name": "Beryl Nut",
-        "description": "Consumable<br>Eat to restore half a health segment."
-    },
-    "bacon-agaric": { // Desc_Shroom_C
-        "name": "Bacon Agaric",
-        "description": "Consumable<br>Eat to restore 2 health segments."
-    },
-    "parachute": { // Desc_Parachute_C
-        "name": "Parachute",
-        "description": "Slows down your fall when activated in mid-air."
     },
     "alien-power-matrix": { // Desc_AlienPowerFuel_C
         "name": "Alien Power Matrix",

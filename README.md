@@ -1,6 +1,9 @@
 # TODO
 
+## Icons
 
+The 256px versions were extracted from the game via FModel. 
+They were reencoded as avif via `avifenc -s 0 -q 70`.
 
 ## License
 

@@ -426,22 +426,6 @@ export const ITEMS = {
         "name": "Smokeless Powder",
         "description": "An explosive powder that is commonly used to produce modern firearms."
     },
-    "candy-cane": { // Desc_CandyCane_C
-        "name": "Candy Cane",
-        "description": "A delicious Candy Cane to be enjoyed during the FICSMAS Holidays. <br>*Disclaimer: Not for consumption..."
-    },
-    "actual-snow": { // Desc_Snow_C
-        "name": "Actual Snow",
-        "description": "It's snow. Not the nice, thick, crunchy kind, though... more the disgustingly wet, slushy kind... Guess we can make stuff from it."
-    },
-    "ficsmas-bow": { // Desc_XmasBow_C
-        "name": "FICSMAS Bow",
-        "description": "A fancy Bow. Maybe someone could wear this? You certainly can't! What you can do is make parts and decorations from it. Probably."
-    },
-    "ficsmas-tree-branch": { // Desc_XmasBranch_C
-        "name": "FICSMAS Tree Branch",
-        "description": "A special Tree Branch used to produce parts and buildings during the FICSMAS Event."
-    },
     "uranium-fuel-rod": { // Desc_NuclearFuelRod_C
         "name": "Uranium Fuel Rod",
         "description": "Used as fuel for Nuclear Power Plants.<br>Caution: Produces radioactive Uranium Waste when consumed.<br>Caution: Moderately Radioactive."
@@ -485,18 +469,6 @@ export const ITEMS = {
     "pulse-nobelisk": { // Desc_NobeliskShockwave_C
         "name": "Pulse Nobelisk",
         "description": "Generates a powerful shockwave instead of a regular explosion."
-    },
-    "sweet-fireworks": { // Desc_Fireworks_Projectile_01_C
-        "name": "Sweet Fireworks",
-        "description": "Merry FICSMAS and a Happy New Year!"
-    },
-    "fancy-fireworks": { // Desc_Fireworks_Projectile_02_C
-        "name": "Fancy Fireworks",
-        "description": "Fireworks are produced from random ingredients. Primarily used for having a good time."
-    },
-    "sparkly-fireworks": { // Desc_Fireworks_Projectile_03_C
-        "name": "Sparkly Fireworks",
-        "description": "Goes Pfffeeeeew... BOOM! *Sparkle*"
     },
     "iron-rebar": { // Desc_SpikedRebar_C
         "name": "Iron Rebar",

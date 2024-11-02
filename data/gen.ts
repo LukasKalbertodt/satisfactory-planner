@@ -92,7 +92,7 @@ const main = async () => {
             throw error;
         }
     };
-    for (const [key, item] of Object.entries(items)) {
+    for (const item of Object.values(items)) {
         const iconPath = `../public/icons/parts/${item.id}.avif`;
         if (!await exists(iconPath)) {
             console.log(`Icon for '${item.name}' is missing: ${iconPath}`);
@@ -183,6 +183,16 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
 
         // Skip all limited-time recipes (e.g. FICSMAS) for now
         if (info.seasons.length > 0) {
+            continue;
+        }
+        // Unfortunately, there are some recipes not marked with `seasons`, but which have these 
+        // FICSMAS items as input.
+        const dependOnFicsmas = [
+            "Recipe_Fireworks_01_C",
+            "Recipe_Fireworks_02_C",
+            "Recipe_Fireworks_03_C",
+        ];
+        if (dependOnFicsmas.includes(rawKey)) {
             continue;
         }
 

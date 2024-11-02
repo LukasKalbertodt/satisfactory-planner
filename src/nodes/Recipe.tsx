@@ -1,6 +1,7 @@
 import { type Node, Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
-import { Item, ItemId, ITEMS, Recipe, RecipeId, RECIPES } from "../gamedata";
+import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
 import { useEffect } from "react";
+import { itemIcon } from "../util";
 
 
 export type RecipeNodeData = {
@@ -99,7 +100,7 @@ const IoEntry = ({ itemId, kind, rate }: IoEntryProps) => (
             }}
         />
         <img 
-            src={`/icons/parts/${itemId}.avif`} 
+            src={itemIcon(itemId)} 
             css={{ height: "100%"}}
         />
         <div css={{

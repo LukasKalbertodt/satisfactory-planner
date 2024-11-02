@@ -1,6 +1,6 @@
 import { ItemId } from "./gamedata";
 
-export const itemIcon = (itemId: ItemId) => `/icons/parts/${itemId}.avif`;
+export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/parts/${itemId}.avif`;
 
 /**
  * A switch-case-like expression with exhaustiveness check (or fallback value).

@@ -3,6 +3,8 @@ import { useReactFlow } from "@xyflow/react";
 
 import { ITEMS, Recipe, recipeEntries, RecipeEntry, RecipeId } from "./gamedata";
 import { itemIcon, match } from "./util";
+import { useStore } from "./store";
+import { useShallow } from "zustand/shallow";
 
 
 export type NewNodeMenuPos = {
@@ -49,14 +51,17 @@ export type NewNodeMenuProps = {
 };
 
 export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
-    const { addNodes, screenToFlowPosition } = useReactFlow();
+    const { addNode } = useStore(useShallow(state => ({
+        addNode: state.addNode,
+    })));
+
+    const { screenToFlowPosition } = useReactFlow();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<RecipeEntry[]>(filterRecipes(query));
     const [selected, setSelected] = useState<RecipeId | null>(results[0]?.id ?? null);
     
     const addRecipe = (id: RecipeId) => {
-        addNodes({
-            id: Math.round(Math.random() * 1000000).toString(36), // TODO
+        addNode({
             position: screenToFlowPosition(pos.mouse),
             type: "recipe",
             data: { recipeId: id },
@@ -147,46 +152,52 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                     },
                 },
             }}>
-                {results.map((recipe) => <li key={recipe.id} data-selected={recipe.id === selected}>
-                    <div onClick={() => addRecipe(recipe.id)} css={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        gap: 4,
-                        width: "100%",
-                    }}>
+                {results.map((recipe) => (
+                    <li 
+                        key={recipe.id} 
+                        data-selected={recipe.id === selected}
+                        onClick={() => addRecipe(recipe.id)}
+                    >
                         <div css={{
-                            height: 20,
                             display: "flex",
-                            alignItems: "center",
+                            justifyContent: "space-between",
                             gap: 4,
-                            img: {
-                                height: "100%",
-                            }
+                            width: "100%",
                         }}>
-                            {recipe.info.inputs.map(i => <img key={i.item} src={itemIcon(i.item)} loading="lazy" />)}
-                            {"→"}
-                            {recipe.info.outputs.map(o => <img key={o.item} src={itemIcon(o.item)} loading="lazy" />)}
+                            <div css={{
+                                height: 20,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 4,
+                                img: {
+                                    height: "100%",
+                                }
+                            }}>
+                                {recipe.info.inputs.map(i => <img key={i.item} src={itemIcon(i.item)} loading="lazy" />)}
+                                {"→"}
+                                {recipe.info.outputs.map(o => <img key={o.item} src={itemIcon(o.item)} loading="lazy" />)}
+                            </div>
+
+                            {recipe.info.alternative && <div css={{
+                                borderRadius: 4,
+                                background: "#fad8b6",
+                                color: "#444",
+                                padding: "1px 4px",
+                                fontSize: 12,
+                                marginLeft: 4,
+                            }}>Alt</div>}
                         </div>
 
-                        {recipe.info.alternative && <div css={{
-                            borderRadius: 4,
-                            background: "#fad8b6",
-                            color: "#444",
-                            padding: "1px 4px",
-                            fontSize: 12,
-                            marginLeft: 4,
-                        }}>Alt</div>}
-                    </div>
-
-                    <div css={{
-                        width: "100%",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        lineHeight: 1.1,
-                        fontStretch: "95%",
-                    }}>{recipe.info.name}</div>
-                </li>)}
+                        <div css={{
+                            width: "100%",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            lineHeight: 1.1,
+                            fontStretch: "95%",
+                        }}>{recipe.info.name}</div>
+                    </li>
+                ))}
             </ul>
         </div>
     )

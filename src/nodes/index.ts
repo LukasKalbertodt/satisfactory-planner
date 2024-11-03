@@ -1,9 +1,16 @@
 import type { NodeTypes } from '@xyflow/react';
 
-import { AppNode } from './types';
 import { RecipeNode } from './Recipe';
+import { FlowNode } from '../store';
 
-export const initialNodes: AppNode[] = [
+export type AppNode = RecipeNode;
+
+export const NODE_TYPES = {
+    "recipe": RecipeNode,
+} satisfies NodeTypes;
+
+// TEMP
+export const initialNodes: FlowNode[] = [
     {
         id: 'b',
         type: 'recipe',
@@ -35,7 +42,3 @@ export const initialNodes: AppNode[] = [
         data: { recipeId: "heavy-encased-frame" },
     },
 ];
-
-export const nodeTypes = {
-    "recipe": RecipeNode,
-} satisfies NodeTypes;

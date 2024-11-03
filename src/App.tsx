@@ -5,6 +5,7 @@ import {
     Controls,
     MiniMap,
     BackgroundVariant,
+    ConnectionLineType,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -14,11 +15,15 @@ import { calcNewNodeMenuPos, NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
 import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
 import { useEventListener } from './util';
+import { EDGE_TYPES } from './edges';
 
 export default function App() {
-    const { nodes, onNodesChange } = useStore(useShallow(state => ({
+    const { nodes, edges, onNodesChange, onEdgesChange, addEdge } = useStore(useShallow(state => ({
         nodes: state.nodes,
+        edges: state.edges,
+        addEdge: state.addEdge,
         onNodesChange: state.onNodesChange,
+        onEdgesChange: state.onEdgesChange,
     })));
     const { undo, redo, pause, resume } = useStore.temporal.getState();
 
@@ -49,12 +54,23 @@ export default function App() {
         <ReactFlow
             ref={ref}
             nodes={nodes}
+            edges={edges.map(edge => ({ ...edge, type: "main" as const }))}
             nodeTypes={NODE_TYPES}
+            edgeTypes={EDGE_TYPES}
             onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+
             deleteKeyCode={["Delete", "Backspace"]}
             onPaneContextMenu={onPaneContextMenu}
             onPaneClick={closeMenu}
             onMove={closeMenu}
+            onConnect={addEdge}
+            isValidConnection={() => { 
+                return true;
+            }}
+            connectionLineType={ConnectionLineType.SmoothStep}
+            connectionLineStyle={{ strokeWidth: 1.5, strokeLinecap: 'round' }}
+            connectionRadius={10}
             onNodeDragStart={pause}
             onNodeDragStop={resume}
             fitView

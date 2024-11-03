@@ -95,7 +95,19 @@ const IoEntry = ({ itemId, kind, rate }: IoEntryProps) => (
             type={kind === "input" ? "target" : "source"} 
             position={kind === "input" ? Position.Left : Position.Right}
             css={{ 
-                [kind === "input" ? "left" : "right"]: -9,
+                [kind === "input" ? "left" : "right"]: -8.5,
+                width: 8,
+                height: 8,
+                background: "white",
+                border: "2px solid #777",
+
+                // Increase clickable area
+                "&::after": {
+                    content: "''",
+                    position: "absolute",
+                    inset: -7,
+                    borderRadius: "50%",
+                },
             }}
         />
         <img 

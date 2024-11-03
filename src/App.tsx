@@ -4,6 +4,7 @@ import {
     Background,
     Controls,
     MiniMap,
+    BackgroundVariant,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -57,8 +58,10 @@ export default function App() {
             onNodeDragStart={pause}
             onNodeDragStop={resume}
             fitView
+            snapToGrid
+            snapGrid={[25, 25]}
         >
-            <Background />
+            <Background gap={25} variant={BackgroundVariant.Cross} />
             <MiniMap />
             <Controls />
             {menuPos && <NewNodeMenu close={closeMenu} pos={menuPos} />}

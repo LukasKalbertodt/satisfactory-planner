@@ -1,24 +1,22 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { applyNodeChanges, OnNodesChange } from "@xyflow/react";
+import { temporal } from 'zundo';
 
-import { RecipeNodeData } from "./nodes/Recipe";
-import { initialNodes } from "./nodes";
+import { FlowNode, initialNodes, NODE_TYPES } from "./nodes";
+import { persist } from "zustand/middleware";
 
 
 export type State = {
     nodes: FlowNode[];
 };
 
-export type FlowNode = {
-    id: string;
-    type: "recipe";
-    position: { x: number, y: number };
-    data: RecipeNodeData;
-};
+/** Node properties that are part of the persisted store. */
+export type NodeCore = Pick<FlowNode, "id" | "position" | "data"> 
+    & { type: keyof typeof NODE_TYPES };
 
 type Actions = {
-    addNode: (node: Omit<FlowNode, "id">) => void;
+    addNode: (node: Omit<NodeCore, "id">) => void;
 
     onNodesChange: OnNodesChange<FlowNode>;
 };
@@ -41,5 +39,19 @@ const stateInit = immer<State & Actions>((set) => ({
 }));
 
 export const useStore = create<State & Actions>()(
-    temporal(stateInit),
+    temporal(
+        persist(stateInit, {
+            name: "satisfactory-planner", // TODO
+            partialize: (state) => ({ 
+                nodes: state.nodes.map(nodeCore),
+            }),
+        }),
+    ),
 );
+
+const nodeCore = (node: FlowNode): NodeCore => ({
+    id: node.id,
+    type: node.type,
+    position: node.position,
+    data: node.data,
+});

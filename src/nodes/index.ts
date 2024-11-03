@@ -1,16 +1,17 @@
 import type { NodeTypes } from '@xyflow/react';
 
 import { RecipeNode } from './Recipe';
-import { FlowNode } from '../store';
+import { NodeCore } from '../store';
 
-export type AppNode = RecipeNode;
+export type FlowNodeTmp = RecipeNode;
+export type FlowNode = FlowNodeTmp & { type: NonNullable<FlowNodeTmp['type']> };
 
 export const NODE_TYPES = {
     "recipe": RecipeNode,
 } satisfies NodeTypes;
 
 // TEMP
-export const initialNodes: FlowNode[] = [
+export const initialNodes: NodeCore[] = [
     {
         id: 'b',
         type: 'recipe',

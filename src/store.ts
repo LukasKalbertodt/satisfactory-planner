@@ -61,7 +61,7 @@ const stateInit = immer<State & Actions>((set, get) => ({
     }),
     onEdgesChange: (changes) => set(state => {
         state.edges = applyEdgeChanges(changes, state.edges);
-  }),
+    }),
 }));
 
 export const useStore = create<State & Actions>()(

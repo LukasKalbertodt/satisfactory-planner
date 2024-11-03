@@ -16,6 +16,7 @@ import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
 import { handleToEntry, useEventListener } from './util';
 import { EDGE_TYPES } from './edges';
+import { Header } from './Header';
 
 export default function App() {
     const { 
@@ -53,7 +54,8 @@ export default function App() {
     );
     const closeMenu = () => setMenuPos(null);
 
-    return (
+    return <>
+        <Header />
         <ReactFlow
             ref={ref}
             nodes={nodes}
@@ -90,5 +92,5 @@ export default function App() {
             <Controls />
             {menuPos && <NewNodeMenu close={closeMenu} pos={menuPos} />}
         </ReactFlow>
-    );
+    </>;
 }

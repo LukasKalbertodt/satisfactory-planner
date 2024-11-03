@@ -26,6 +26,9 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
             textAlign: "center",
             border: "1px solid #777",
             background: "white",
+            "&:hover": {
+                background: "#f8f8f8",
+            },
             ...selected && {
                 background: "#f8f8f8",
                 outline: "2px solid #efc74f",

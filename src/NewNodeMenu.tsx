@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useReactFlow } from "@xyflow/react";
 
 import { ITEMS, Recipe, recipeEntries, RecipeEntry, RecipeId } from "./gamedata";
-import { itemIcon, match } from "./util";
+import { itemIcon, match, useEventListener } from "./util";
 import { useStore } from "./store";
 import { useShallow } from "zustand/shallow";
 
@@ -70,26 +70,19 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
     };
 
     // Keyboard control (arrow keys and enter).
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-                e.preventDefault();
-                setSelected((prev) => {
-                    const currentIndex = results.findIndex(({ id }) => id === prev);
-                    const nextIndex = e.key === "ArrowDown"
-                        ? Math.min(currentIndex + 1, results.length - 1)
-                        : Math.max(currentIndex - 1, 0);
-                    return results[nextIndex].id;
-                });
-            } else if (e.key === "Enter" && selected) {
-                addRecipe(selected);
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
+    useEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            setSelected((prev) => {
+                const currentIndex = results.findIndex(({ id }) => id === prev);
+                const nextIndex = e.key === "ArrowDown"
+                    ? Math.min(currentIndex + 1, results.length - 1)
+                    : Math.max(currentIndex - 1, 0);
+                return results[nextIndex].id;
+            });
+        } else if (e.key === "Enter" && selected) {
+            addRecipe(selected);
+        }
     });
 
     return (

@@ -1,6 +1,17 @@
+import { useEffect } from "react";
 import { ItemId } from "./gamedata";
 
 export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/parts/${itemId}.avif`;
+
+export const useEventListener = <K extends keyof WindowEventMap>(
+    type: K, 
+    listener: (this: Window, ev: WindowEventMap[K]) => void,
+) => {
+    useEffect(() => {
+        window.addEventListener(type, listener);
+        return () => window.removeEventListener(type, listener);
+    });
+};
 
 /**
  * A switch-case-like expression with exhaustiveness check (or fallback value).
@@ -26,22 +37,22 @@ export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/pa
 export function match<T extends string | number, Out>(
     value: T,
     arms: Record<T, () => Out>,
-  ): Out;
-  export function match<T extends string | number, Out>(
+): Out;
+export function match<T extends string | number, Out>(
     value: T,
     arms: Partial<Record<T, () => Out>>,
     fallback: () => Out,
-  ): Out;
-  export function match<T extends string | number, Out>(
+): Out;
+export function match<T extends string | number, Out>(
     value: T,
     arms: Partial<Record<T, () => Out>>,
     fallback?: () => Out,
-  ): Out {
+): Out {
     return fallback === undefined
-      // Unfortunately, we haven't found a way to make the TS typesystem to
-      // understand that in the case of `fallback === undefined`, `arms` is
-      // not a partial map. But it is, as you can see from the two callable
-      // signatures above.
-      ? arms[value]!()
-      : (arms[value] as (() => Out) | undefined ?? fallback)();
-  }
+        // Unfortunately, we haven't found a way to make the TS typesystem to
+        // understand that in the case of `fallback === undefined`, `arms` is
+        // not a partial map. But it is, as you can see from the two callable
+        // signatures above.
+        ? arms[value]!()
+        : (arms[value] as (() => Out) | undefined ?? fallback)();
+}

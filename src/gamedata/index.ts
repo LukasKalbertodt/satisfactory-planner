@@ -13,6 +13,15 @@ export type Item = {
 };
 
 export type RecipeId = keyof typeof RECIPES_;
+export type RecipeEntry = {
+    id: RecipeId;
+    info: Recipe;
+};
+
+export const recipeEntries = (): RecipeEntry[] => (
+    Object.entries(RECIPES).map(([id, info]) => ({ id: id as RecipeId, info }))
+);
+
 /** Information about a recipe. */
 export type Recipe = {
     /** Human-readable name of the recipe. */

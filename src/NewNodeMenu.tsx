@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { ITEMS, Recipe, RecipeId, RECIPES } from "./gamedata";
-import { itemIcon, match } from "./util";
+import { useState, useEffect } from "react";
 import { useReactFlow } from "@xyflow/react";
+
+import { ITEMS, Recipe, recipeEntries, RecipeEntry, RecipeId } from "./gamedata";
+import { itemIcon, match } from "./util";
+
 
 export type NewNodeMenuPos = {
     css: {
@@ -49,8 +51,9 @@ export type NewNodeMenuProps = {
 export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
     const { addNodes, screenToFlowPosition } = useReactFlow();
     const [query, setQuery] = useState("");
+    const [results, setResults] = useState<RecipeEntry[]>(filterRecipes(query));
+    const [selected, setSelected] = useState<RecipeId | null>(results[0]?.id ?? null);
     
-    const results = filterRecipes(query);
     const addRecipe = (id: RecipeId) => {
         addNodes({
             id: Math.round(Math.random() * 1000000).toString(36), // TODO
@@ -60,6 +63,29 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
         });
         close();
     };
+
+    // Keyboard control (arrow keys and enter).
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                e.preventDefault();
+                setSelected((prev) => {
+                    const currentIndex = results.findIndex(({ id }) => id === prev);
+                    const nextIndex = e.key === "ArrowDown"
+                        ? Math.min(currentIndex + 1, results.length - 1)
+                        : Math.max(currentIndex - 1, 0);
+                    return results[nextIndex].id;
+                });
+            } else if (e.key === "Enter" && selected) {
+                addRecipe(selected);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    });
 
     return (
         <div css={{
@@ -84,7 +110,15 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                 placeholder="Add recipe"
                 autoFocus
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                    const q = e.target.value;
+                    setQuery(q)
+                    const newResults = filterRecipes(q);
+                    setResults(newResults);
+                    if (selected && !newResults.some(({ id }) => id === selected)) {
+                        setSelected(newResults[0]?.id ?? null);
+                    }
+                }}
                 css={{ 
                     width: "100%", 
                     boxSizing: "border-box",
@@ -107,14 +141,14 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                     background: "white",
                     borderRadius: 4,
                     cursor: "pointer",
-                    "&:hover": {
+                    "&:hover, &[data-selected=true]": {
                         outline: "2px solid #aaa",
                         outlineOffset: -2,
                     },
                 },
             }}>
-                {results.map(([id, recipe]) => <li key={id}>
-                    <div onClick={() => addRecipe(id)} css={{
+                {results.map((recipe) => <li key={recipe.id} data-selected={recipe.id === selected}>
+                    <div onClick={() => addRecipe(recipe.id)} css={{
                         display: "flex",
                         justifyContent: "space-between",
                         gap: 4,
@@ -129,12 +163,12 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                                 height: "100%",
                             }
                         }}>
-                            {recipe.inputs.map(i => <img key={i.item} src={itemIcon(i.item)} loading="lazy" />)}
+                            {recipe.info.inputs.map(i => <img key={i.item} src={itemIcon(i.item)} loading="lazy" />)}
                             {"→"}
-                            {recipe.outputs.map(o => <img key={o.item} src={itemIcon(o.item)} loading="lazy" />)}
+                            {recipe.info.outputs.map(o => <img key={o.item} src={itemIcon(o.item)} loading="lazy" />)}
                         </div>
 
-                        {recipe.alternative && <div css={{
+                        {recipe.info.alternative && <div css={{
                             borderRadius: 4,
                             background: "#fad8b6",
                             color: "#444",
@@ -151,17 +185,16 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                         textOverflow: "ellipsis",
                         lineHeight: 1.1,
                         fontStretch: "95%",
-                    }}>{recipe.name}</div>
+                    }}>{recipe.info.name}</div>
                 </li>)}
             </ul>
         </div>
     )
 };
 
-type RecipeEntries = [RecipeId, Recipe][];
-const filterRecipes = (query: string): RecipeEntries => {
+const filterRecipes = (query: string): RecipeEntry[] => {
     // Sort recipes to roughly match "simpler recipes first".
-    const sort = (arr: RecipeEntries) => arr.sort((a, b) => {
+    const sort = (arr: RecipeEntry[]) => arr.sort((a, b) => {
         const score = (r: Recipe): number => {
             // The building has the highest impact on the score.
             const buildingScore = match(r.producedIn, {
@@ -185,18 +218,18 @@ const filterRecipes = (query: string): RecipeEntries => {
             return buildingScore + numInputs * 10 + numOutputs * 20 +  r.duration;
         };
 
-        return score(a[1]) - score(b[1]);
+        return score(a.info) - score(b.info);
     });
 
-    const nameMatches: RecipeEntries = [];
-    const outputMatches: RecipeEntries = [];
+    const nameMatches: RecipeEntry[] = [];
+    const outputMatches: RecipeEntry[] = [];
 
     const q = query.toLowerCase();
-    for (const [id, recipe] of Object.entries(RECIPES) as RecipeEntries) {
-        if (recipe.name.toLowerCase().includes(q)) {
-            nameMatches.push([id, recipe]);
-        } else if (recipe.outputs.some(o => ITEMS[o.item].name.toLowerCase().includes(q))) {
-            outputMatches.push([id, recipe]);
+    for (const recipe of recipeEntries()) {
+        if (recipe.info.name.toLowerCase().includes(q)) {
+            nameMatches.push(recipe);
+        } else if (recipe.info.outputs.some(o => ITEMS[o.item].name.toLowerCase().includes(q))) {
+            outputMatches.push(recipe);
         }
     }
     sort(nameMatches);

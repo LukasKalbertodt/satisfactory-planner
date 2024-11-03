@@ -1,7 +1,7 @@
 import { type Node, Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
 import { useEffect } from "react";
-import { itemIcon } from "../util";
+import { handleId, itemIcon } from "../util";
 
 
 export type RecipeNodeData = {
@@ -52,7 +52,8 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 <div>
                     {recipe.inputs.map((input, idx) => (
                         <IoEntry 
-                            key={idx} 
+                            key={idx}
+                            idx={idx}
                             itemId={input.item} 
                             rate={amountToRate(input.amount)} 
                             kind="input" 
@@ -63,6 +64,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                     {recipe.outputs.map((output, idx) => (
                         <IoEntry 
                             key={idx} 
+                            idx={idx}
                             itemId={output.item} 
                             rate={amountToRate(output.amount)} 
                             kind="output" 
@@ -75,12 +77,13 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
 };
 
 type IoEntryProps = {
+    idx: number;
     itemId: ItemId;
     rate: number;
     kind: "input" | "output";
 };
 
-const IoEntry = ({ itemId, kind, rate }: IoEntryProps) => (
+const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
     <div css={{
         position: "relative",
         height: 22,
@@ -91,7 +94,7 @@ const IoEntry = ({ itemId, kind, rate }: IoEntryProps) => (
         alignItems: "center",
     }}>
         <Handle 
-            id={kind + "-" + itemId}
+            id={handleId(idx, kind)}
             type={kind === "input" ? "target" : "source"} 
             position={kind === "input" ? Position.Left : Position.Right}
             css={{ 
@@ -100,6 +103,13 @@ const IoEntry = ({ itemId, kind, rate }: IoEntryProps) => (
                 height: 8,
                 background: "white",
                 border: "2px solid #777",
+
+                "&.connectingto": {
+                    background: "#c0392b",
+                    "&.valid": {
+                        background: "#2ecc71",
+                    },
+                },
 
                 // Increase clickable area
                 "&::after": {

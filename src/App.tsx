@@ -14,13 +14,16 @@ import { NODE_TYPES } from './nodes';
 import { calcNewNodeMenuPos, NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
 import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
-import { useEventListener } from './util';
+import { handleToEntry, useEventListener } from './util';
 import { EDGE_TYPES } from './edges';
 
 export default function App() {
-    const { nodes, edges, onNodesChange, onEdgesChange, addEdge } = useStore(useShallow(state => ({
+    const { 
+        nodes, edges, getNode, onNodesChange, onEdgesChange, addEdge,
+    } = useStore(useShallow(state => ({
         nodes: state.nodes,
         edges: state.edges,
+        getNode: state.getNode,
         addEdge: state.addEdge,
         onNodesChange: state.onNodesChange,
         onEdgesChange: state.onEdgesChange,
@@ -65,8 +68,13 @@ export default function App() {
             onPaneClick={closeMenu}
             onMove={closeMenu}
             onConnect={addEdge}
-            isValidConnection={() => { 
-                return true;
+            isValidConnection={connection => { 
+                // TODO: handle special cases to remove `!`
+                const source = getNode(connection.source)!;
+                const target = getNode(connection.target)!;
+                const sourceItem = handleToEntry(source, connection.sourceHandle!).item;
+                const targetItem = handleToEntry(target, connection.targetHandle!).item;
+                return sourceItem === targetItem;
             }}
             connectionLineType={ConnectionLineType.SmoothStep}
             connectionLineStyle={{ strokeWidth: 1.5, strokeLinecap: 'round' }}

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { ItemId } from "./gamedata";
+import { ItemId, RECIPES } from "./gamedata";
+import { RecipeNode } from "./nodes/Recipe";
 
 export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/parts/${itemId}.avif`;
 
@@ -11,6 +12,20 @@ export const useEventListener = <K extends keyof WindowEventMap>(
         window.addEventListener(type, listener);
         return () => window.removeEventListener(type, listener);
     });
+};
+
+export const handleId = (idx: number, kind: "input" | "output") => 
+    match(kind, { input: () => "i", output: () => "o" }) + ":" + idx;
+
+export const handleToEntry = (node: RecipeNode, handle: string) => {
+    // TODO: what if the handle is invalid?
+    const [kind, idx] = handle.split(":");
+    const field = match(kind, { 
+        "i": () => "inputs" as const,
+        "o": () => "outputs" as const,
+    });
+    const io = RECIPES[node.data.recipeId][field];
+    return io[Number(idx)];
 };
 
 /**

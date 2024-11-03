@@ -35,15 +35,14 @@ export type Recipe = {
     /** For recipes inside fluctuating power buildings, the min and max power requirement. */
     powerRequirements?: [number, number];
     /** Inputs for the recipe. */
-    inputs: {
-        item: ItemId;
-        amount: number;
-    }[],
+    inputs: IoEntry[];
     /** Outputs for the recipe. */
-    outputs: {
-        item: ItemId;
-        amount: number;
-    }[],
+    outputs: IoEntry[];
+};
+
+export type IoEntry = {
+    item: ItemId;
+    amount: number;
 };
 
 /** All buildings that can run recipes. */

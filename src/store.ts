@@ -22,6 +22,8 @@ export type NodeCore = Pick<FlowNode, "id" | "position" | "data">
 export type EdgeCore = Pick<MainEdge, "id" | "source" | "sourceHandle" | "target" | "targetHandle">;
 
 type Actions = {
+    getNode(id: string): FlowNode | undefined;
+
     addNode: (node: Omit<NodeCore, "id">) => void;
     addEdge: (connection: Connection) => void;
 
@@ -36,8 +38,12 @@ const initialState: State = {
     edgeIdCounter: 0,
 };
 
-const stateInit = immer<State & Actions>((set) => ({
+const stateInit = immer<State & Actions>((set, get) => ({
     ...initialState,        
+
+    // TODO: O(n). Fine for now, and probably ever. Using a Map would require converting back and 
+    // forth to an array a lot. Maintaining a second data structure seems overkill for now.
+    getNode: (id) => get().nodes.find(n => n.id === id),
 
     addNode: (node) => set(state => {
         const id = state.nodeIdCounter.toString(16);

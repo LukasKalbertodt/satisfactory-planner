@@ -15,12 +15,11 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
     useEffect(() => updateNodeInternals(id));
 
     const recipe = RECIPES[data.recipeId];
-    const singleOutput = recipe.outputs.length === 1;
     const amountToRate = (amount: number) => amount / recipe.duration * 60;
 
     return (
         <div css={{
-            maxWidth: singleOutput ? 140 : 250,
+            width: 250,
             padding: 8,
             fontSize: 12,
             borderRadius: 4,
@@ -60,7 +59,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                         />
                     ))}
                 </div>
-                {!singleOutput && <div>
+                <div>
                     {recipe.outputs.map((output, idx) => (
                         <IoEntry 
                             key={idx} 
@@ -69,7 +68,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                             kind="output" 
                         />
                     ))}
-                </div>}
+                </div>
             </div>
         </div>
     );

@@ -27,7 +27,7 @@ const initialState: State = {
     nodes: initialNodes,
 };
 
-export const useStore = create<State & Actions>()(immer((set) => ({
+const stateInit = immer<State & Actions>((set) => ({
     ...initialState,        
 
     addNode: (node) => set(state => {
@@ -38,4 +38,8 @@ export const useStore = create<State & Actions>()(immer((set) => ({
     onNodesChange: (changes) => set(state => {
           state.nodes = applyNodeChanges(changes, state.nodes);
     }),
-})));
+}));
+
+export const useStore = create<State & Actions>()(
+    temporal(stateInit),
+);

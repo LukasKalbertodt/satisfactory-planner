@@ -3,7 +3,7 @@ import { immer } from "zustand/middleware/immer";
 import { applyEdgeChanges, applyNodeChanges, Connection, OnEdgesChange, OnNodesChange } from "@xyflow/react";
 import { temporal } from 'zundo';
 
-import { FlowNode, initialNodes, NODE_TYPES } from "./nodes";
+import { FlowNode, NODE_TYPES } from "./nodes";
 import { persist } from "zustand/middleware";
 import { MainEdge } from "./edges";
 
@@ -30,7 +30,7 @@ type Actions = {
 };
 
 const initialState: State = {
-    nodes: initialNodes,
+    nodes: [],
     nodeIdCounter: 0,
     edges: [],
     edgeIdCounter: 0,

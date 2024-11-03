@@ -9,6 +9,7 @@ import { persist } from "zustand/middleware";
 
 export type State = {
     nodes: FlowNode[];
+    nodeIdCounter: number;
 };
 
 /** Node properties that are part of the persisted store. */
@@ -23,13 +24,15 @@ type Actions = {
 
 const initialState: State = {
     nodes: initialNodes,
+    nodeIdCounter: 0,
 };
 
 const stateInit = immer<State & Actions>((set) => ({
     ...initialState,        
 
     addNode: (node) => set(state => {
-        const id = Math.random().toString(); // TODO
+        const id = state.nodeIdCounter.toString(16);
+        state.nodeIdCounter += 1;
         state.nodes.push({ id, ...node });
     }),
 
@@ -43,6 +46,7 @@ export const useStore = create<State & Actions>()(
         persist(stateInit, {
             name: "satisfactory-planner", // TODO
             partialize: (state) => ({ 
+                ...state,
                 nodes: state.nodes.map(nodeCore),
             }),
         }),

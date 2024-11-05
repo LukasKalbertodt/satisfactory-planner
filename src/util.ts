@@ -20,12 +20,19 @@ export const handleId = (idx: number, kind: "input" | "output") =>
 export const handleToEntry = (node: RecipeNode, handle: string) => {
     // TODO: what if the handle is invalid?
     const [kind, idx] = handle.split(":");
-    const field = match(kind, { 
+    const field = match(kind, {
         "i": () => "inputs" as const,
         "o": () => "outputs" as const,
     });
     const io = RECIPES[node.data.recipeId][field];
     return io[Number(idx)];
+};
+
+export const nodeColor = (kind: "splitter" | "merger") => {
+    return match(kind, {
+        splitter: () => ({ normal: "#e3efff", hover: "#cddff7" }),
+        merger: () => ({ normal: "#faebdd", hover: "#efd9c4" }),
+    });
 };
 
 /**
@@ -63,6 +70,10 @@ export function match<T extends string | number, Out>(
     arms: Partial<Record<T, () => Out>>,
     fallback?: () => Out,
 ): Out {
+    if (!(value in arms)) {
+        throw new Error(`Non-exhaustive match: ${value} not inside ${Object.keys(arms)}`);
+    }
+    
     return fallback === undefined
         // Unfortunately, we haven't found a way to make the TS typesystem to
         // understand that in the case of `fallback === undefined`, `arms` is

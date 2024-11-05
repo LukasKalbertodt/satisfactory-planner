@@ -10,13 +10,15 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { NODE_TYPES } from './nodes';
+import { FlowNode, NODE_TYPES } from './nodes';
 import { calcNewNodeMenuPos, NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
 import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
-import { handleToEntry, useEventListener } from './util';
+import { handleToEntry, match, useEventListener } from './util';
 import { EDGE_TYPES } from './edges';
 import { Header } from './Header';
+import { ItemId } from './gamedata';
+import { RecipeNode } from './nodes/Recipe';
 
 export default function App() {
     const { 
@@ -71,12 +73,24 @@ export default function App() {
             onMove={closeMenu}
             onConnect={addEdge}
             isValidConnection={connection => { 
-                // TODO: handle special cases to remove `!`
                 const source = getNode(connection.source)!;
                 const target = getNode(connection.target)!;
-                const sourceItem = handleToEntry(source, connection.sourceHandle!).item;
-                const targetItem = handleToEntry(target, connection.targetHandle!).item;
-                return sourceItem === targetItem;
+
+                const getItem = (node: FlowNode, handle?: string | null): ItemId | undefined => {
+                    return match(node.type, {
+                        "recipe": () => (
+                            handleToEntry(node as RecipeNode, handle!).item
+                        ),
+                        "splitter": () => undefined, // TODO
+                        "merger": () => undefined, // TODO
+                    });
+                };
+
+                const sourceItem = getItem(source, connection.sourceHandle);
+                const targetItem = getItem(target, connection.targetHandle);
+                return sourceItem === undefined 
+                    || targetItem === undefined 
+                    || sourceItem === targetItem;
             }}
             connectionLineType={ConnectionLineType.SmoothStep}
             connectionLineStyle={{ strokeWidth: 1.5, strokeLinecap: 'round' }}

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useReactFlow } from "@xyflow/react";
+import { useShallow } from "zustand/shallow";
 
 import { ITEMS, Recipe, recipeEntries, RecipeEntry, RecipeId } from "./gamedata";
-import { itemIcon, match, useEventListener } from "./util";
+import { itemIcon, match, nodeColor, useEventListener } from "./util";
 import { useStore } from "./store";
-import { useShallow } from "zustand/shallow";
+import SplitterIcon from "./icons/splitter.svg?react";
+import MergerIcon from "./icons/merger.svg?react";
+import { FlowNode, NODE_TYPES } from "./nodes";
 
 
 export type NewNodeMenuPos = {
@@ -60,14 +63,20 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
     const [results, setResults] = useState<RecipeEntry[]>(filterRecipes(query));
     const [selected, setSelected] = useState<RecipeId | null>(results[0]?.id ?? null);
     
-    const addRecipe = (id: RecipeId) => {
+    const addNodeImpl = (
+        type: keyof typeof NODE_TYPES, 
+        data?: Extract<FlowNode, { type: typeof type }>["data"],
+    ) => {
         addNode({
             position: screenToFlowPosition(pos.mouse),
-            type: "recipe",
-            data: { recipeId: id },
+            type,
+            data: data ?? {},
         });
         close();
     };
+    const addRecipe = (id: RecipeId) => addNodeImpl("recipe", { recipeId: id });
+    const addSplitter = () => addNodeImpl("splitter");
+    const addMerger = () => addNodeImpl("merger");
 
     // Keyboard control (arrow keys and enter).
     useEventListener("keydown", (e: KeyboardEvent) => {
@@ -103,6 +112,39 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
             border: "1px solid #bbb",
             boxShadow: "0 0 16px rgba(0, 0, 0, 0.3)",
         }}>
+            <div css={{
+                marginBottom: 4,
+                display: "flex",
+                gap: 8,
+                "& > button": {
+                    width: 32,
+                    height: 32,
+                    borderRadius: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid #999",
+                    fontSize: 24,
+                    cursor: "pointer",
+                }
+            }}>
+                <button onClick={addSplitter} css={{
+                    background: nodeColor("splitter").normal,
+                    "&:hover": {
+                        background: nodeColor("splitter").hover,
+                    },
+                }}>
+                    <SplitterIcon />
+                </button>
+                <button onClick={addMerger} css={{
+                    background: nodeColor("merger").normal,
+                    "&:hover": {
+                        background: nodeColor("merger").hover,
+                    },
+                }}>
+                    <MergerIcon />
+                </button>
+            </div>
             <input 
                 type="text" 
                 placeholder="Add recipe"

@@ -48,7 +48,8 @@ const stateInit = immer<State & Actions>((set, get) => ({
     addNode: (node) => set(state => {
         const id = state.nodeIdCounter.toString(16);
         state.nodeIdCounter += 1;
-        state.nodes.push({ id, ...node });
+        // TODO: cast is weird
+        state.nodes.push({ id, ...node } as State["nodes"][0]);
     }),
     addEdge: (connection) => set(state => {
         const id = state.edgeIdCounter.toString(16);

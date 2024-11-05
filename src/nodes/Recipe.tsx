@@ -2,6 +2,7 @@ import { type Node, Handle, NodeProps, Position, useUpdateNodeInternals } from "
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
 import { useEffect } from "react";
 import { handleId, itemIcon } from "../util";
+import { handleCss } from "./util";
 
 
 export type RecipeNodeData = {
@@ -102,25 +103,7 @@ const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
             position={kind === "input" ? Position.Left : Position.Right}
             css={{ 
                 [kind === "input" ? "left" : "right"]: -8.5,
-                width: 8,
-                height: 8,
-                background: "white",
-                border: "2px solid #777",
-
-                "&.connectingto": {
-                    background: "#c0392b",
-                    "&.valid": {
-                        background: "#2ecc71",
-                    },
-                },
-
-                // Increase clickable area
-                "&::after": {
-                    content: "''",
-                    position: "absolute",
-                    inset: -7,
-                    borderRadius: "50%",
-                },
+                ...handleCss
             }}
         />
         <img 

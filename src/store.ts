@@ -6,6 +6,7 @@ import { temporal } from 'zundo';
 import { FlowNode, NODE_TYPES } from "./nodes";
 import { persist } from "zustand/middleware";
 import { MainEdge } from "./edges";
+import { RecipeNodeData } from "./nodes/Recipe";
 
 
 export type State = {
@@ -15,6 +16,8 @@ export type State = {
     edgeIdCounter: number;
 };
 
+type NodeId = string;
+
 /** Node properties that are part of the persisted store. */
 export type NodeCore = Pick<FlowNode, "id" | "position" | "data"> 
     & { type: keyof typeof NODE_TYPES };
@@ -22,10 +25,12 @@ export type NodeCore = Pick<FlowNode, "id" | "position" | "data">
 export type EdgeCore = Pick<MainEdge, "id" | "source" | "sourceHandle" | "target" | "targetHandle">;
 
 type Actions = {
-    getNode(id: string): FlowNode | undefined;
+    /** Returns a node by ID. */
+    getNode(id: NodeId): FlowNode | undefined;
 
     addNode: (node: Omit<NodeCore, "id">) => void;
     addEdge: (connection: Connection) => void;
+    setRecipeNodeData: (node: NodeId, data: RecipeNodeData) => void;
 
     onNodesChange: OnNodesChange<FlowNode>;
     onEdgesChange: OnEdgesChange<MainEdge>;
@@ -55,6 +60,9 @@ const stateInit = immer<State & Actions>((set, get) => ({
         const id = state.edgeIdCounter.toString(16);
         state.edgeIdCounter += 1;
         state.edges.push({ id, type: "main", ...connection });
+    }),
+    setRecipeNodeData: (nodeId, data) => set(state => {
+        state.nodes.find(n => n.id === nodeId)!.data = data;
     }),
 
     onNodesChange: (changes) => set(state => {

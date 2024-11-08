@@ -32,3 +32,9 @@ body,
 * {
     box-sizing: border-box;
 }
+
+input, button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}

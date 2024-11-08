@@ -4,15 +4,15 @@ import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.DEPLOY_PATH || '/',
-  plugins: [react({
-      jsxImportSource: '@emotion/react',
-      babel: {
-          plugins: ['@emotion/babel-plugin']
-      }
-  }), svgr({
-      svgrOptions: {
-          icon: true,
-      },
-  })],
+    base: process.env.DEPLOY_PATH || '/',
+    plugins: [react({
+        jsxImportSource: '@emotion/react',
+        babel: {
+            plugins: ['@emotion/babel-plugin']
+        }
+    }), svgr({
+        svgrOptions: {
+            icon: true,
+        },
+    })],
 })

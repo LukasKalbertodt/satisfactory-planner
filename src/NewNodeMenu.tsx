@@ -74,7 +74,10 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
         });
         close();
     };
-    const addRecipe = (id: RecipeId) => addNodeImpl("recipe", { recipeId: id });
+    const addRecipe = (id: RecipeId) => addNodeImpl("recipe", { 
+        recipeId: id, 
+        buildingsCount: 1, 
+    });
     const addSplitter = () => addNodeImpl("splitter");
     const addMerger = () => addNodeImpl("merger");
 
@@ -163,7 +166,6 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                     width: "100%", 
                     boxSizing: "border-box",
                     fontSize: 16,
-                    fontFamily: "inherit",
                     border: "1px solid #999",
                     borderRadius: 4,
                     padding: "4px 8px"

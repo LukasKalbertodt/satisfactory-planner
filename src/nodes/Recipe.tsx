@@ -42,35 +42,37 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 outline: "2px solid #efc74f",
             },
         }}>
-            <div css={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                alignItems: "center",
-                paddingTop: 2,
-                fontFamily: "Hubot Sans",
+            <div css={{ 
+                height: 46,
+                paddingBottom: 4,
+                marginBottom: 4,
+                borderBottom: "1px solid #e0e0e0",
             }}>
-                <BuildingsCount 
-                    count={data.buildingsCount} 
-                    setCount={count => updateData({ buildingsCount: count })} 
-                />
-                <Overclock 
-                    overclock={data.overclock} 
-                    setOverclock={overclock => updateData({ overclock })} 
-                />
-                <div />
+                <div css={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    alignItems: "center",
+                    paddingTop: 2,
+                    fontFamily: "Hubot Sans",
+                }}>
+                    <BuildingsCount 
+                        count={data.buildingsCount} 
+                        setCount={count => updateData({ buildingsCount: count })} 
+                    />
+                    <Overclock 
+                        overclock={data.overclock} 
+                        setOverclock={overclock => updateData({ overclock })} 
+                    />
+                    <div />
+                </div>
+                <div css={{
+                    fontFamily: "Hubot Sans",
+                    fontWeight: "bold",
+                }}>{recipe.name}</div>
             </div>
-            <div css={{
-                fontFamily: "Hubot Sans",
-                fontWeight: "bold",
-            }}>{recipe.name}</div>
-            <hr css={{
-                border: "none",
-                borderTop: "1px solid #e0e0e0",
-            }} />
             <div css={{
                 display: "flex",
                 justifyContent: "space-between",
-                marginTop: 10,
                 padding: "0 8px",
                 fontSize: 10,
                 gap: 8,
@@ -115,11 +117,11 @@ type IoEntryProps = {
 const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
     <div css={{
         position: "relative",
-        height: 22,
+        height: 23,
+        marginBottom: 2,
         display: "flex",
         flexDirection: kind === "input" ? "row" : "row-reverse",
         gap: 8,
-        margin: "2px 0",
         alignItems: "center",
     }}>
         <Handle 

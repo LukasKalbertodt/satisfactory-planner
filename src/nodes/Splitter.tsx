@@ -8,9 +8,21 @@ export type SplitterNode = Node<SplitterNodeData, "splitter">;
 
 export const SplitterNode = ({ selected }: NodeProps<SplitterNode>) => {
     return <CombinerNode selected={selected ?? false} kind="splitter">
-        <Handle id="s0" type="source" css={handleCss} position={Position.Top} />
-        <Handle id="s1" type="source" css={handleCss} position={Position.Right} />
-        <Handle id="s2" type="source" css={handleCss} position={Position.Bottom} />
-        <Handle id="t" type="target" css={handleCss} position={Position.Left} />
+        {[Position.Top, Position.Left, Position.Bottom, Position.Right].map(pos => (
+            <Handle 
+                key={pos}
+                id={SPLITTER_HANDLE_IDS[pos]} 
+                type={pos === Position.Left ? "target" : "source"}
+                css={handleCss}
+                position={pos} 
+            />
+        ))}
     </CombinerNode>;
+};
+
+export const SPLITTER_HANDLE_IDS = {
+    [Position.Top]: "s0",
+    [Position.Left]: "t",
+    [Position.Bottom]: "s2",
+    [Position.Right]: "s1",
 };

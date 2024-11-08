@@ -16,7 +16,7 @@ export type State = {
     edgeIdCounter: number;
 };
 
-type NodeId = string;
+export type NodeId = string;
 
 /** Node properties that are part of the persisted store. */
 export type NodeCore = Pick<FlowNode, "id" | "position" | "data"> 

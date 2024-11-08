@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ItemId, RECIPES } from "./gamedata";
 import { RecipeNode } from "./nodes/Recipe";
+import { Position } from "@xyflow/react";
 
 export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/parts/${itemId}.avif`;
 
@@ -16,6 +17,14 @@ export const useEventListener = <K extends keyof WindowEventMap>(
 
 export const handleId = (idx: number, kind: "input" | "output") => 
     match(kind, { input: () => "i", output: () => "o" }) + ":" + idx;
+
+export const recipeHandlePos = (handleId: string) => {
+    const [kind,] = handleId.split(":");
+    return match(kind, {
+        "i": () => Position.Left,
+        "o": () => Position.Right,
+    });
+};
 
 export const handleToEntry = (node: RecipeNode, handle: string) => {
     // TODO: what if the handle is invalid?

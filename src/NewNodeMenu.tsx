@@ -34,7 +34,7 @@ export const calcNewNodeMenuPos = (
     // the mouse, but if that would it to overflow, we position it differently.
     return ({
         css: {
-            ...e.clientY < bounds.height - HEIGHT 
+            ...(e.clientY < bounds.height - HEIGHT || e.clientY < HEIGHT)
                 ? { top: e.clientY }
                 : { bottom: bounds.bottom - e.clientY },
             ...e.clientX < bounds.width - WIDTH

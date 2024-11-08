@@ -1,6 +1,6 @@
-import { type Node, Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
+import { type Node, Handle, NodeProps, Position } from "@xyflow/react";
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { handleId, itemIcon } from "../util";
 import { handleCss } from "./util";
 import { useStore } from "../store";
@@ -17,10 +17,6 @@ export type RecipeNode = Node<RecipeNodeData, "recipe">;
 export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
     const setData = useStore(state => state.setRecipeNodeData);
     const updateData = (update: Partial<RecipeNodeData>) => setData(id, { ...data, ...update });
-
-    // We need to tell react-flow to update handle information once after mounting everything.
-    const updateNodeInternals = useUpdateNodeInternals();
-    useEffect(() => updateNodeInternals(id));
 
     const recipe = RECIPES[data.recipeId];
     const amountToRate = (amount: number) => amount / recipe.duration * 60;

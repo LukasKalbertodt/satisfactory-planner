@@ -1,6 +1,6 @@
 import { type Node, Handle, NodeProps, Position, useUpdateNodeInternals } from "@xyflow/react";
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { handleId, itemIcon } from "../util";
 import { handleCss } from "./util";
 import { useStore } from "../store";
@@ -10,6 +10,7 @@ import { LuMinus, LuPlus } from "react-icons/lu";
 export type RecipeNodeData = {
     recipeId: RecipeId;
     buildingsCount: number;
+    overclock: number;
 };
 export type RecipeNode = Node<RecipeNodeData, "recipe">;
 
@@ -42,13 +43,19 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
             },
         }}>
             <div css={{
-                display: "flex",
-                justifyContent: "space-between",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                alignItems: "center",
                 paddingTop: 2,
+                fontFamily: "Hubot Sans",
             }}>
                 <BuildingsCount 
                     count={data.buildingsCount} 
                     setCount={count => updateData({ buildingsCount: count })} 
+                />
+                <Overclock 
+                    overclock={data.overclock} 
+                    setOverclock={overclock => updateData({ overclock })} 
                 />
                 <div />
             </div>
@@ -166,12 +173,12 @@ const BuildingsCount = ({ count, setCount }: BuildingsCountProps) => {
     return (
         <div css={{
             "--border-color": "#bbb",
-            fontFamily: "Hubot Sans",
             fontSize: 12,
             display: "flex",
             alignItems: "center",
             height: 18,
             lineHeight: 1,
+            marginRight: "auto",
             marginLeft: -10,
             "& > button": {
                 visibility: "hidden",
@@ -250,4 +257,71 @@ const BuildingsCount = ({ count, setCount }: BuildingsCountProps) => {
             </button>
         </div>
     );
+};
+
+type OverclockProps = {
+    overclock: number;
+    setOverclock: (overclock: number) => void;
+};
+
+const Overclock = ({ overclock, setOverclock }: OverclockProps) => {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const setAndClose = (v: number) => {
+        setOverclock(v);
+        setMenuOpen(false);
+    };
+
+    return (
+        <div css={{
+            position: "relative",
+            fontSize: 10,
+            margin: "0 auto",
+            color: overclock === 1 ? "#777" : "black",
+        }}>
+            <div onClick={() => setMenuOpen(old => !old)} css={{
+                cursor: "pointer",
+                padding: "0 4px",
+                borderRadius: 4,
+                "&:hover": {
+                    background: "#ddd",
+                },
+            }}>
+                {Math.round(overclock * 10000) / 100}%
+            </div>
+            {menuOpen && (
+                <div css={{
+                    position: "absolute",
+                    bottom: "calc(100% + 1px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    background: "white",
+                    borderRadius: 4,
+                    border: "1px solid #aaa",
+                    boxShadow: "0 0 8px rgba(0, 0, 0, 0.4)",
+                    padding: 2,
+                }}>
+                    <div css={{
+                        display: "flex",
+                        gap: 4,
+                        "& > button": {
+                            background: "#f2f2f2",
+                            border: "1px solid #ddd",
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            "&:hover:not([disabled])": {
+                                background: "#e0e0e0",
+                                borderColor: "#bbb",
+                            },
+                        },
+                    }}>
+                        {[0.5, 1.0, 1.5, 2.0, 2.5].map(v => (
+                            <button disabled={v === overclock} key={v} onClick={() => setAndClose(v)}>
+                                {Math.round(v * 100)}%
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );    
 };

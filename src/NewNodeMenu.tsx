@@ -77,6 +77,7 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
     const addRecipe = (id: RecipeId) => addNodeImpl("recipe", { 
         recipeId: id, 
         buildingsCount: 1, 
+        overclock: 1,
     });
     const addSplitter = () => addNodeImpl("splitter");
     const addMerger = () => addNodeImpl("merger");

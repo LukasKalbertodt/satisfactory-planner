@@ -24,6 +24,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
 
     const recipe = RECIPES[data.recipeId];
     const amountToRate = (amount: number) => amount / recipe.duration * 60;
+    const totalMultiplier = data.buildingsCount * data.overclock;
 
     return (
         <div css={{
@@ -87,6 +88,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                             idx={idx}
                             itemId={input.item} 
                             rate={amountToRate(input.amount)} 
+                            totalRate={totalMultiplier * amountToRate(input.amount)}
                             kind="input" 
                         />
                     ))}
@@ -98,6 +100,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                             idx={idx}
                             itemId={output.item} 
                             rate={amountToRate(output.amount)} 
+                            totalRate={totalMultiplier * amountToRate(output.amount)}
                             kind="output" 
                         />
                     ))}
@@ -111,10 +114,16 @@ type IoEntryProps = {
     idx: number;
     itemId: ItemId;
     rate: number;
+    totalRate: number;
     kind: "input" | "output";
 };
 
-const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
+const rateCss = {
+    fontFamily: "Hubot Sans",
+    fontWeight: "bold",
+} as const;
+
+const IoEntry = ({ idx, itemId, kind, rate, totalRate }: IoEntryProps) => (
     <div css={{
         position: "relative",
         height: 23,
@@ -124,13 +133,21 @@ const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
         gap: 8,
         alignItems: "center",
     }}>
+        <div css={{
+            ...rateCss,
+            position: "absolute",
+            [kind === "input" ? "right" : "left"]: "calc(100% + 15px)",
+            background: "rgba(255, 255, 255, 0.8)",
+            color: "#30336b",
+            padding: "1px 2px",
+        }}>{totalRate.toString().slice(0, 6)}</div>
         <Handle 
             id={handleId(idx, kind)}
             type={kind === "input" ? "target" : "source"} 
             position={kind === "input" ? Position.Left : Position.Right}
             css={{ 
                 [kind === "input" ? "left" : "right"]: -8.5,
-                ...handleCss
+                ...handleCss,
             }}
         />
         <img 
@@ -138,8 +155,7 @@ const IoEntry = ({ idx, itemId, kind, rate }: IoEntryProps) => (
             css={{ height: "100%"}}
         />
         <div css={{
-            fontFamily: "Hubot Sans",
-            fontWeight: "bold",
+            ...rateCss,
             minWidth: 20,
             flex: "0 0 auto",
             textAlign: "right",

@@ -2,7 +2,7 @@ import { type Node, Handle, NodeProps, Position } from "@xyflow/react";
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
 import { useState } from "react";
 import { handleId, itemIcon } from "../util";
-import { handleCss } from "./util";
+import { handleCss, rateCss, settingsPopoverCss, totalRateCss } from "./util";
 import { useStore } from "../store";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
@@ -33,6 +33,9 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
             background: "white",
             "&:hover": {
                 background: "var(--active-background)",
+            },
+            "&:not(:hover) .visible-on-hover": {
+                visibility: "hidden",
             },
             ...selected && {
                 background: "var(--active-background)",
@@ -114,11 +117,6 @@ type IoEntryProps = {
     kind: "input" | "output";
 };
 
-const rateCss = {
-    fontFamily: "Hubot Sans",
-    fontWeight: "bold",
-} as const;
-
 const IoEntry = ({ idx, itemId, kind, rate, totalRate }: IoEntryProps) => (
     <div css={{
         position: "relative",
@@ -130,12 +128,9 @@ const IoEntry = ({ idx, itemId, kind, rate, totalRate }: IoEntryProps) => (
         alignItems: "center",
     }}>
         <div css={{
-            ...rateCss,
+            ...totalRateCss,
             position: "absolute",
             [kind === "input" ? "right" : "left"]: "calc(100% + 15px)",
-            background: "rgba(255, 255, 255, 0.8)",
-            color: "#30336b",
-            padding: "1px 2px",
         }}>{totalRate.toString().slice(0, 6)}</div>
         <Handle 
             id={handleId(idx, kind)}
@@ -304,15 +299,11 @@ const Overclock = ({ overclock, setOverclock }: OverclockProps) => {
             </div>
             {menuOpen && (
                 <div css={{
+                    ...settingsPopoverCss,
                     position: "absolute",
                     bottom: "calc(100% + 1px)",
                     left: "50%",
                     transform: "translateX(-50%)",
-                    background: "white",
-                    borderRadius: 4,
-                    border: "1px solid #aaa",
-                    boxShadow: "0 0 8px rgba(0, 0, 0, 0.4)",
-                    padding: 2,
                 }}>
                     <div css={{
                         display: "flex",

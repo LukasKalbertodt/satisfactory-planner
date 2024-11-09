@@ -25,6 +25,26 @@ export const handleCss = {
     },
 } as const;
 
+export const rateCss = {
+    fontFamily: "Hubot Sans",
+    fontWeight: "bold",
+} as const;
+
+export const totalRateCss = {
+    ...rateCss,
+    background: "rgba(255, 255, 255, 0.8)",
+    color: "#30336b",
+    padding: "1px 2px",
+};
+
+export const settingsPopoverCss = {
+    background: "white",
+    borderRadius: 4,
+    border: "1px solid #aaa",
+    boxShadow: "0 0 8px rgba(0, 0, 0, 0.4)",
+    padding: 4,
+};
+
 type CombinerNodeProps = React.PropsWithChildren<{
     kind: "splitter" | "merger";
     selected: boolean;

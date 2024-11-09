@@ -60,3 +60,20 @@ type ProductionBuilding =
     | "converter"
     | "quantum-encoder"
     ;
+
+export const RESOURCE_ITEMS = [
+    "iron-ore",
+    "copper-ore",
+    "limestone",
+    "coal",
+    "water",
+    "raw-quartz",
+    "sulfur",
+    "crude-oil",
+    "caterium-ore",
+    "bauxite",
+    "uranium",
+    "sam",
+] as const satisfies ItemId[];
+
+export type ResourceItem = typeof RESOURCE_ITEMS[number];

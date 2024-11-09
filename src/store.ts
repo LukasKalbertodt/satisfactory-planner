@@ -7,6 +7,7 @@ import { FlowNode, NODE_TYPES } from "./nodes";
 import { persist } from "zustand/middleware";
 import { MainEdge } from "./edges";
 import { RecipeNodeData } from "./nodes/Recipe";
+import { SourceNodeData } from "./nodes/Source";
 
 
 export type State = {
@@ -31,6 +32,7 @@ type Actions = {
     addNode: (node: Omit<NodeCore, "id">) => void;
     addEdge: (connection: Connection) => void;
     setRecipeNodeData: (node: NodeId, data: RecipeNodeData) => void;
+    setSourceNodeData: (node: NodeId, data: SourceNodeData) => void;
 
     onNodesChange: OnNodesChange<FlowNode>;
     onEdgesChange: OnEdgesChange<MainEdge>;
@@ -62,6 +64,9 @@ const stateInit = immer<State & Actions>((set, get) => ({
         state.edges.push({ id, type: "main", ...connection });
     }),
     setRecipeNodeData: (nodeId, data) => set(state => {
+        state.nodes.find(n => n.id === nodeId)!.data = data;
+    }),
+    setSourceNodeData: (nodeId, data) => set(state => {
         state.nodes.find(n => n.id === nodeId)!.data = data;
     }),
 

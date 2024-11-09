@@ -22,6 +22,7 @@ export const MainEdge = ({
             "recipe": () => recipeHandlePos(handleId),
             "merger": () => revLookup(MERGER_HANDLE_IDS),
             "splitter": () => revLookup(SPLITTER_HANDLE_IDS),
+            "source": () => Position.Right,
         });
     };
 

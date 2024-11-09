@@ -19,6 +19,7 @@ import { EDGE_TYPES } from './edges';
 import { Header } from './Header';
 import { ItemId } from './gamedata';
 import { RecipeNode } from './nodes/Recipe';
+import { SourceNode } from './nodes/Source';
 
 export default function App() {
     const { 
@@ -81,6 +82,7 @@ export default function App() {
                         "recipe": () => (
                             handleToEntry(node as RecipeNode, handle!).item
                         ),
+                        "source": () => (node as SourceNode).data.item,
                         "splitter": () => undefined, // TODO
                         "merger": () => undefined, // TODO
                     });

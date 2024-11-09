@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useReactFlow } from "@xyflow/react";
 import { useShallow } from "zustand/shallow";
+import { LuArrowRightFromLine } from "react-icons/lu";
 
 import { ITEMS, Recipe, recipeEntries, RecipeEntry, RecipeId } from "./gamedata";
 import { itemIcon, match, nodeColor, useEventListener } from "./util";
@@ -81,6 +82,7 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
     });
     const addSplitter = () => addNodeImpl("splitter");
     const addMerger = () => addNodeImpl("merger");
+    const addSource = () => addNodeImpl("source", { item: "iron-ore", rate: 60 });
 
     // Keyboard control (arrow keys and enter).
     useEventListener("keydown", (e: KeyboardEvent) => {
@@ -123,7 +125,6 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                 "& > button": {
                     width: 32,
                     height: 32,
-                    borderRadius: 10,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -132,8 +133,18 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                     cursor: "pointer",
                 }
             }}>
+                <button onClick={addSource} css={{
+                    borderRadius: "50%",
+                    background: "#b6ffc9",
+                    "&:hover": {
+                        background: "#a5eeb8",
+                    },
+                }}>
+                    <LuArrowRightFromLine />
+                </button>
                 <button onClick={addSplitter} css={{
                     background: nodeColor("splitter").normal,
+                    borderRadius: 10,
                     "&:hover": {
                         background: nodeColor("splitter").hover,
                     },
@@ -142,6 +153,7 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                 </button>
                 <button onClick={addMerger} css={{
                     background: nodeColor("merger").normal,
+                    borderRadius: 10,
                     "&:hover": {
                         background: nodeColor("merger").hover,
                     },

@@ -39,4 +39,12 @@ export class RecipeGraphNode extends GraphNode {
     outputs(): GraphHandleId[] {
         return RECIPES[this.recipe].outputs.map((_, idx) => recipeHandleIdFor(idx, "output"));
     }
+
+    entry(handle: GraphHandleId): IoEntry {
+        const [xputs, idx] = handle < 4
+            ? [RECIPES[this.recipe].inputs, handle]
+            : [RECIPES[this.recipe].outputs, handle - 4];
+
+        return notNullish(xputs[idx]);
+    }
 }

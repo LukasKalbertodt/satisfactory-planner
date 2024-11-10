@@ -1,5 +1,5 @@
 import { XYPosition } from "@xyflow/react";
-import { match, unreachable } from "../util";
+import { match, notNullish, unreachable } from "../util";
 import { immerable } from "immer";
 import { type RecipeGraphNode } from "./recipe";
 import { type MergerGraphNode } from "./merger";
@@ -22,6 +22,18 @@ export abstract class GraphNode {
     abstract type(): NodeTypes;
     abstract inputs(): GraphHandleId[];
     abstract outputs(): GraphHandleId[];
+    handles(): GraphHandleId[] {
+        return [...this.inputs(), ...this.outputs()];
+    }
+    upstreamNeighbors(): GraphHandle[] {
+        return this.inputs().map(h => this.incomingEdges.get(h)).filter(h => !!h);
+    }
+    downstreamNeighbors(): GraphHandle[] {
+        return this.outputs().map(h => this.outgoingEdges.get(h)).filter(h => !!h);
+    }
+    neighbors(): GraphHandle[] {
+        return [...this.upstreamNeighbors(), ...this.downstreamNeighbors()];
+    };
 
     match<A, B, C, D>(cases: {
         recipe: (node: RecipeGraphNode, type: "recipe") => A;

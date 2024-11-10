@@ -2,6 +2,7 @@ import { bug, notNullish } from "../util";
 import { NODE_TYPES } from "../nodes";
 import { immerable } from "immer";
 import { type GraphNode } from "./node";
+import { ItemId } from "../gamedata";
 
 
 export type GraphNodeId = number & { readonly __tag: unique symbol };
@@ -41,23 +42,45 @@ export class Graph {
     }
 
     isValidConnection(source: GraphHandle, target: GraphHandle): boolean {
-        return true; // TODO
-        // const getItem = (node: FlowNode, handle?: string | null): ItemId | undefined => {
-        //     return match(node.type, {
-        //         "recipe": () => (
-        //             handleToEntry(node as RecipeNode, handle!).item
-        //         ),
-        //         "source": () => (node as SourceNode).data.item,
-        //         "splitter": () => undefined, // TODO
-        //         "merger": () => undefined, // TODO
-        //     });
-        // };
+        const getItem = (handle: GraphHandle): ItemId | undefined => {
+            const getDirectItem = ({ node, handle }: GraphHandle): ItemId | undefined => {
+                const n = this.node(node);
+                return n.match({
+                    recipe: (node) => node.entry(handle).item,
+                    merger: (node) => undefined,
+                    splitter: (node) => undefined,
+                    source: (node) => node.item,
+                });
+            };
 
-        // const sourceItem = getItem(source, connection.sourceHandle);
-        // const targetItem = getItem(target, connection.targetHandle);
-        // return sourceItem === undefined 
-        //     || targetItem === undefined 
-        //     || sourceItem === targetItem;
+            // DFS and take the first item we find
+            const visited = new Set<GraphHandle>();
+            const stack = [handle];
+            while (stack.length > 0) {
+                const curr = stack.pop()!;
+                const item = getDirectItem(curr);
+                if (item) {
+                    return item;
+                }
+
+                if (visited.has(curr)) {
+                    continue;
+                }
+                visited.add(curr);
+
+                const n = this.node(curr.node);
+                n.neighbors().forEach(h => stack.push(h));
+            }
+
+            return undefined;
+        };
+
+
+        const sourceItem = getItem(source);
+        const targetItem = getItem(target);
+        return sourceItem === undefined
+            || targetItem === undefined
+            || sourceItem === targetItem;
     }
 
     addNode(node: GraphNode): GraphNodeId {

@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { ItemId, RECIPES } from "./gamedata";
-import { RecipeNode } from "./nodes/Recipe";
-import { Position } from "@xyflow/react";
+import { ItemId } from "./gamedata";
+import { GraphHandle, GraphHandleId, GraphNodeId } from "./graph";
 
 export const itemIcon = (itemId: ItemId) => `${import.meta.env.BASE_URL}icons/parts/${itemId}.avif`;
 
 export const useEventListener = <K extends keyof WindowEventMap>(
-    type: K, 
+    type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => void,
 ) => {
     useEffect(() => {
@@ -15,27 +14,38 @@ export const useEventListener = <K extends keyof WindowEventMap>(
     });
 };
 
-export const handleId = (idx: number, kind: "input" | "output") => 
-    match(kind, { input: () => "i", output: () => "o" }) + ":" + idx;
-
-export const recipeHandlePos = (handleId: string) => {
-    const [kind,] = handleId.split(":");
-    return match(kind, {
-        "i": () => Position.Left,
-        "o": () => Position.Right,
-    });
+export const toFlowNodeId = (id: GraphNodeId): string => id.toString(16);
+export const fromFlowNodeId = (id: string): GraphNodeId => parseInt(id, 16) as GraphNodeId;
+export const toFlowHandleId = (id: GraphHandleId): string => id.toString();
+export const fromFlowHandleId = (id: string): GraphHandleId => {
+    const out = parseInt(id);
+    if (isNaN(out)) {
+        bug(`Invalid handle id '${id}'`);
+    }
+    return out as GraphHandleId;
+};
+export const connectionToHandles = (c: {
+    source: string;
+    sourceHandle?: string | null;
+    target: string;
+    targetHandle?: string | null;
+}): [GraphHandle, GraphHandle] => [
+    new GraphHandle(fromFlowNodeId(c.source), fromFlowHandleId(notNullish(c.sourceHandle))),
+    new GraphHandle(fromFlowNodeId(c.target), fromFlowHandleId(notNullish(c.targetHandle))),
+];
+export const handlePairToEdgeId = (source: GraphHandle, target: GraphHandle) =>
+    toFlowNodeId(source.node) + ":" + toFlowHandleId(source.handle)
+        + "-" + toFlowNodeId(target.node) + ":" + toFlowHandleId(target.handle);
+export const edgeIdToHandlePair = (id: string): [GraphHandle, GraphHandle] => {
+    const [source, target] = id.split("-");
+    const [sourceNode, sourceHandle] = source.split(":");
+    const [targetNode, targetHandle] = target.split(":");
+    return [
+        new GraphHandle(fromFlowNodeId(sourceNode), fromFlowHandleId(sourceHandle)),
+        new GraphHandle(fromFlowNodeId(targetNode), fromFlowHandleId(targetHandle)),
+    ];
 };
 
-export const handleToEntry = (node: RecipeNode, handle: string) => {
-    // TODO: what if the handle is invalid?
-    const [kind, idx] = handle.split(":");
-    const field = match(kind, {
-        "i": () => "inputs" as const,
-        "o": () => "outputs" as const,
-    });
-    const io = RECIPES[node.data.recipeId][field];
-    return io[Number(idx)];
-};
 
 export const nodeColor = (kind: "splitter" | "merger") => {
     return match(kind, {
@@ -82,7 +92,7 @@ export function match<T extends string | number, Out>(
     if (!(value in arms)) {
         throw new Error(`Non-exhaustive match: ${value} not inside ${Object.keys(arms)}`);
     }
-    
+
     return fallback === undefined
         // Unfortunately, we haven't found a way to make the TS typesystem to
         // understand that in the case of `fallback === undefined`, `arms` is
@@ -91,3 +101,38 @@ export function match<T extends string | number, Out>(
         ? arms[value]!()
         : (arms[value] as (() => Out) | undefined ?? fallback)();
 }
+
+/**
+ * A custom error type that represents bugs: errors that are not expected and
+ * that cannot be handled. They are caused by a bug in our code and not by the
+ * "world" (e.g. any input). Use the helper functions below to throw this error.
+ */
+export class Bug extends Error {
+    public constructor(msg: string) {
+        super(`${msg} (this is a bug in this application)`);
+        this.name = "Bug";
+    }
+}
+
+/** Throws a `Bug` error. Use this function to signal a bug in the code. */
+export const bug = (msg: string): never => {
+    throw new Bug(msg);
+};
+
+/** Like `bug`, but specifically for code paths that should be unreachable. */
+export const unreachable = (msg?: string): never => {
+    const prefix = "reached unreachable code";
+    throw new Bug(msg === undefined ? prefix : `${prefix}: ${msg}`);
+};
+
+/**
+ * Asserts that the given value is neither null nor undefined and throws an
+ * exception otherwise.
+ */
+export const notNullish = <T, >(v: T | null | undefined, msg?: string): T => {
+    if (v == null) {
+        return bug(msg ?? "value was unexpectedly nullish");
+    }
+
+    return v;
+};

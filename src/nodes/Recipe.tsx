@@ -1,10 +1,12 @@
 import { type Node, Handle, NodeProps, Position } from "@xyflow/react";
 import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
 import { useState } from "react";
-import { handleId, itemIcon } from "../util";
+import { fromFlowNodeId, itemIcon, toFlowHandleId } from "../util";
 import { handleCss, rateCss, settingsPopoverCss, totalRateCss } from "./util";
 import { useStore } from "../store";
 import { LuMinus, LuPlus } from "react-icons/lu";
+import { useShallow } from "zustand/shallow";
+import { recipeHandleIdFor } from "../graph/recipe";
 
 
 export type RecipeNodeData = {
@@ -15,12 +17,17 @@ export type RecipeNodeData = {
 export type RecipeNode = Node<RecipeNodeData, "recipe">;
 
 export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
-    const setData = useStore(state => state.setRecipeNodeData);
-    const updateData = (update: Partial<RecipeNodeData>) => setData(id, { ...data, ...update });
+    const { graph, setRecipeNodeData } = useStore(useShallow(state => ({
+        graph: state.graph,
+        setRecipeNodeData: state.setRecipeNodeData,
+    })));
+    const updateData = (update: Partial<RecipeNodeData>) => 
+        setRecipeNodeData(fromFlowNodeId(id), update);
 
     const recipe = RECIPES[data.recipeId];
     const amountToRate = (amount: number) => amount / recipe.duration * 60;
     const totalMultiplier = data.buildingsCount * data.overclock;
+    const graphNode = graph.node(fromFlowNodeId(id));
 
     return (
         <div css={{
@@ -89,6 +96,9 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                             rate={amountToRate(input.amount)} 
                             totalRate={totalMultiplier * amountToRate(input.amount)}
                             kind="input" 
+                            isConnectable={
+                                !graphNode.incomingEdges.has(recipeHandleIdFor(idx, "input"))
+                            }
                         />
                     ))}
                 </div>
@@ -100,7 +110,10 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                             itemId={output.item} 
                             rate={amountToRate(output.amount)} 
                             totalRate={totalMultiplier * amountToRate(output.amount)}
-                            kind="output" 
+                            kind="output"
+                            isConnectable={
+                                !graphNode.outgoingEdges.has(recipeHandleIdFor(idx, "input"))
+                            }
                         />
                     ))}
                 </div>
@@ -115,9 +128,10 @@ type IoEntryProps = {
     rate: number;
     totalRate: number;
     kind: "input" | "output";
+    isConnectable: boolean;
 };
 
-const IoEntry = ({ idx, itemId, kind, rate, totalRate }: IoEntryProps) => (
+const IoEntry = ({ idx, itemId, kind, rate, totalRate, isConnectable }: IoEntryProps) => (
     <div css={{
         position: "relative",
         height: 23,
@@ -133,7 +147,8 @@ const IoEntry = ({ idx, itemId, kind, rate, totalRate }: IoEntryProps) => (
             [kind === "input" ? "right" : "left"]: "calc(100% + 15px)",
         }}>{totalRate.toString().slice(0, 6)}</div>
         <Handle 
-            id={handleId(idx, kind)}
+            id={toFlowHandleId(recipeHandleIdFor(idx, kind))}
+            isConnectable={isConnectable}
             type={kind === "input" ? "target" : "source"} 
             position={kind === "input" ? Position.Left : Position.Right}
             css={{ 

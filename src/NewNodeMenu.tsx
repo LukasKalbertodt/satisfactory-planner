@@ -8,7 +8,11 @@ import { itemIcon, match, nodeColor, useEventListener } from "./util";
 import { useStore } from "./store";
 import SplitterIcon from "./icons/splitter.svg?react";
 import MergerIcon from "./icons/merger.svg?react";
-import { FlowNode, NODE_TYPES } from "./nodes";
+import { GraphNode } from "./graph/node";
+import { RecipeGraphNode } from "./graph/recipe";
+import { SplitterGraphNode } from "./graph/splitter";
+import { MergerGraphNode } from "./graph/merger";
+import { SourceGraphNode } from "./graph/source";
 
 
 export type NewNodeMenuPos = {
@@ -28,10 +32,10 @@ const WIDTH = 250;
 const HEIGHT = 320;
 
 export const calcNewNodeMenuPos = (
-    e: React.MouseEvent | MouseEvent, 
+    e: React.MouseEvent | MouseEvent,
     bounds: DOMRect,
 ): NewNodeMenuPos => {
-    // Set just one property per dimension. The menu defaults to opening to the right bottom of 
+    // Set just one property per dimension. The menu defaults to opening to the right bottom of
     // the mouse, but if that would it to overflow, we position it differently.
     return ({
         css: {
@@ -55,34 +59,24 @@ export type NewNodeMenuProps = {
 };
 
 export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
-    const { addNode } = useStore(useShallow(state => ({
-        addNode: state.addNode,
+    const { addNodeInner } = useStore(useShallow(state => ({
+        addNodeInner: state.addNode,
     })));
 
     const { screenToFlowPosition } = useReactFlow();
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<RecipeEntry[]>(filterRecipes(query));
     const [selected, setSelected] = useState<RecipeId | null>(results[0]?.id ?? null);
-    
-    const addNodeImpl = (
-        type: keyof typeof NODE_TYPES, 
-        data?: Extract<FlowNode, { type: typeof type }>["data"],
-    ) => {
-        addNode({
-            position: screenToFlowPosition(pos.mouse),
-            type,
-            data: data ?? {},
-        });
+
+    const nodePos = () => screenToFlowPosition(pos.mouse);
+    const addNode = (n: GraphNode) => {
+        addNodeInner(n);
         close();
     };
-    const addRecipe = (id: RecipeId) => addNodeImpl("recipe", { 
-        recipeId: id, 
-        buildingsCount: 1, 
-        overclock: 1,
-    });
-    const addSplitter = () => addNodeImpl("splitter");
-    const addMerger = () => addNodeImpl("merger");
-    const addSource = () => addNodeImpl("source", { item: "iron-ore", rate: 60 });
+    const addRecipe = (recipe: RecipeId) => addNode(new RecipeGraphNode(recipe, nodePos()));
+    const addSplitter = () => addNode(new SplitterGraphNode(nodePos()));
+    const addMerger = () => addNode(new MergerGraphNode(nodePos()));
+    const addSource = () => addNode(new SourceGraphNode("iron-ore", 60, nodePos()));
 
     // Keyboard control (arrow keys and enter).
     useEventListener("keydown", (e: KeyboardEvent) => {
@@ -161,8 +155,8 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                     <MergerIcon />
                 </button>
             </div>
-            <input 
-                type="text" 
+            <input
+                type="text"
                 placeholder="Add recipe"
                 autoFocus
                 value={query}
@@ -175,14 +169,14 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                         setSelected(newResults[0]?.id ?? null);
                     }
                 }}
-                css={{ 
-                    width: "100%", 
+                css={{
+                    width: "100%",
                     boxSizing: "border-box",
                     fontSize: 16,
                     border: "1px solid #999",
                     borderRadius: 4,
                     padding: "4px 8px"
-                }} 
+                }}
             />
 
             <ul css={{
@@ -203,8 +197,8 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
                 },
             }}>
                 {results.map((recipe) => (
-                    <li 
-                        key={recipe.id} 
+                    <li
+                        key={recipe.id}
                         data-selected={recipe.id === selected}
                         onClick={() => addRecipe(recipe.id)}
                     >

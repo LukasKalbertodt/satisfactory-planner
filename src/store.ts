@@ -1,106 +1,105 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { applyEdgeChanges, applyNodeChanges, Connection, OnEdgesChange, OnNodesChange } from "@xyflow/react";
+import { XYPosition } from "@xyflow/react";
 import { temporal } from 'zundo';
 
-import { FlowNode, NODE_TYPES } from "./nodes";
-import { persist } from "zustand/middleware";
-import { MainEdge } from "./edges";
 import { RecipeNodeData } from "./nodes/Recipe";
 import { SourceNodeData } from "./nodes/Source";
+import { Graph, GraphHandle, GraphNodeId } from "./graph";
+import { GraphNode } from "./graph/node";
+import { bug } from "./util";
+import { SourceGraphNode } from "./graph/source";
+import { RecipeGraphNode } from "./graph/recipe";
 
 
 export type State = {
-    nodes: FlowNode[];
-    nodeIdCounter: number;
-    edges: MainEdge[];
-    edgeIdCounter: number;
+    graph: Graph;
 };
 
-export type NodeId = string;
-
-/** Node properties that are part of the persisted store. */
-export type NodeCore = Pick<FlowNode, "id" | "position" | "data"> 
-    & { type: keyof typeof NODE_TYPES };
-
-export type EdgeCore = Pick<MainEdge, "id" | "source" | "sourceHandle" | "target" | "targetHandle">;
-
 type Actions = {
-    /** Returns a node by ID. */
-    getNode(id: NodeId): FlowNode | undefined;
-
-    addNode: (node: Omit<NodeCore, "id">) => void;
-    addEdge: (connection: Connection) => void;
-    setRecipeNodeData: (node: NodeId, data: RecipeNodeData) => void;
-    setSourceNodeData: (node: NodeId, data: SourceNodeData) => void;
-
-    onNodesChange: OnNodesChange<FlowNode>;
-    onEdgesChange: OnEdgesChange<MainEdge>;
+    addNode: (node: GraphNode) => void;
+    removeNode: (id: GraphNodeId) => void;
+    addEdge: (source: GraphHandle, target: GraphHandle) => void;
+    removeEdge: (source: GraphHandle, target: GraphHandle) => void;
+    updateNodePos: (id: GraphNodeId, pos: XYPosition) => void;
+    setRecipeNodeData: (node: GraphNodeId, data: Partial<RecipeNodeData>) => void;
+    setSourceNodeData: (node: GraphNodeId, data: Partial<SourceNodeData>) => void;
 };
 
 const initialState: State = {
-    nodes: [],
-    nodeIdCounter: 0,
-    edges: [],
-    edgeIdCounter: 0,
+    graph: new Graph(),
 };
 
-const stateInit = immer<State & Actions>((set, get) => ({
-    ...initialState,        
-
-    // TODO: O(n). Fine for now, and probably ever. Using a Map would require converting back and 
-    // forth to an array a lot. Maintaining a second data structure seems overkill for now.
-    getNode: (id) => get().nodes.find(n => n.id === id),
+const stateInit = immer<State & Actions>(set => ({
+    ...initialState,
 
     addNode: (node) => set(state => {
-        const id = state.nodeIdCounter.toString(16);
-        state.nodeIdCounter += 1;
-        // TODO: cast is weird
-        state.nodes.push({ id, ...node } as State["nodes"][0]);
+        state.graph.addNode(node);
     }),
-    addEdge: (connection) => set(state => {
-        const id = state.edgeIdCounter.toString(16);
-        state.edgeIdCounter += 1;
-        state.edges.push({ id, type: "main", ...connection });
+    removeNode: (id) => set(state => {
+        state.graph.removeNode(id);
     }),
-    setRecipeNodeData: (nodeId, data) => set(state => {
-        state.nodes.find(n => n.id === nodeId)!.data = data;
+    addEdge: (source, target) => set(state => {
+        state.graph.addEdge(source, target);
     }),
-    setSourceNodeData: (nodeId, data) => set(state => {
-        state.nodes.find(n => n.id === nodeId)!.data = data;
+    removeEdge: (source, target) => set(state => {
+        state.graph.removeEdge(source, target);
+    }),
+    updateNodePos: (id, pos) => set(state => {
+        state.graph.nodes.get(id)!.pos = pos;
     }),
 
-    onNodesChange: (changes) => set(state => {
-          state.nodes = applyNodeChanges(changes, state.nodes);
+    setRecipeNodeData: (nodeId, data) => set(state => {
+        const node = state.graph.node(nodeId);
+        if (!(node instanceof RecipeGraphNode)) {
+            return bug("node is not a source node");
+        }
+        node.recipe = data.recipeId ?? node.recipe;
+        node.buildingsCount = data.buildingsCount ?? node.buildingsCount;
+        node.overclock = data.overclock ?? node.overclock;
     }),
-    onEdgesChange: (changes) => set(state => {
-        state.edges = applyEdgeChanges(changes, state.edges);
+    setSourceNodeData: (nodeId, data) => set(state => {
+        const node = state.graph.node(nodeId);
+        if (!(node instanceof SourceGraphNode)) {
+            return bug("node is not a source node");
+        }
+        node.item = data.item ?? node.item;
+        node.rate = data.rate ?? node.rate;
     }),
 }));
 
 export const useStore = create<State & Actions>()(
     temporal(
-        persist(stateInit, {
-            name: "satisfactory-planner", // TODO
-            partialize: (state) => ({ 
-                ...state,
-                nodes: state.nodes.map(nodeCore),
-                edges: state.edges.map(edgeCore),
-            }),
-        }),
+        stateInit,
+        // persist(stateInit, {
+        //     name: "satisfactory-planner", // TODO
+        //     partialize: (state) => { console.log(state); return ({
+        //         ...state,
+        //         nodes: state.nodes.map(nodeCore),
+        //         edges: state.edges.map(edgeCore),
+        //     })},
+        // }),
     ),
 );
 
-const nodeCore = (node: FlowNode): NodeCore => ({
-    id: node.id,
-    type: node.type,
-    position: node.position,
-    data: node.data,
-});
-const edgeCore = (edge: MainEdge): EdgeCore => ({
-    id: edge.id,
-    source: edge.source,
-    sourceHandle: edge.sourceHandle,
-    target: edge.target,
-    targetHandle: edge.targetHandle,
-});
+
+// /** Node properties that are part of the persisted store. */
+// export type NodeCore = Pick<FlowNode, "id" | "position" | "data">
+//     & { type: keyof typeof NODE_TYPES };
+
+// export type EdgeCore = Pick<MainEdge, "id" | "source" | "sourceHandle" | "target" | "targetHandle">;
+
+
+// const nodeCore = (node: FlowNode): NodeCore => ({
+//     id: node.id,
+//     type: node.type,
+//     position: node.position,
+//     data: node.data,
+// });
+// const edgeCore = (edge: MainEdge): EdgeCore => ({
+//     id: edge.id,
+//     source: edge.source,
+//     sourceHandle: edge.sourceHandle,
+//     target: edge.target,
+//     targetHandle: edge.targetHandle,
+// });

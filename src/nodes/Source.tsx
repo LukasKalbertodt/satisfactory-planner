@@ -1,7 +1,7 @@
 import { type Node, Handle, NodeProps, Position, useEdges } from "@xyflow/react";
 
 import { handleCss, settingsPopoverCss, totalRateCss } from "./util";
-import { itemIcon } from "../util";
+import { fromFlowNodeId, itemIcon } from "../util";
 import { ITEMS, RESOURCE_ITEMS, ResourceItem } from "../gamedata";
 import { useStore } from "../store";
 
@@ -14,7 +14,8 @@ export type SourceNode = Node<SourceNodeData, "source">;
 
 export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
     const setData = useStore(store => store.setSourceNodeData);
-    const updateData = (update: Partial<SourceNodeData>) => setData(id, { ...data, ...update });
+    const updateData = (update: Partial<SourceNodeData>) => 
+        setData(fromFlowNodeId(id), update);
     const edges = useEdges();
     const hasConnection = edges.some(edge => edge.source === id);
 
@@ -58,8 +59,9 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
             <Handle
                 type="source"
                 position={Position.Right}
-                id="output"
+                id="0"
                 css={{ ...handleCss, right: -8 }}
+                isConnectable={!hasConnection}
             />
 
             {/* Settings menu */}

@@ -34,6 +34,9 @@ export abstract class GraphNode {
     neighbors(): GraphHandle[] {
         return [...this.upstreamNeighbors(), ...this.downstreamNeighbors()];
     };
+    isHandleConnected(handle: GraphHandleId): boolean {
+        return this.incomingEdges.has(handle) || this.outgoingEdges.has(handle);
+    }
 
     match<A, B, C, D>(cases: {
         recipe: (node: RecipeGraphNode, type: "recipe") => A;

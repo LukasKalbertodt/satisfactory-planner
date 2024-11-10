@@ -14,7 +14,7 @@ export type SourceNode = Node<SourceNodeData, "source">;
 
 export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
     const setData = useStore(store => store.setSourceNodeData);
-    const updateData = (update: Partial<SourceNodeData>) => 
+    const updateData = (update: Partial<SourceNodeData>) =>
         setData(fromFlowNodeId(id), update);
     const edges = useEdges();
     const hasConnection = edges.some(edge => edge.source === id);
@@ -32,8 +32,8 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 outlineOffset: 2,
             },
         }}>
-            <img 
-                src={itemIcon(data.item)} 
+            <img
+                src={itemIcon(data.item)}
                 css={{ height: "100%"}}
             />
             <div css={{
@@ -73,7 +73,7 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 transform: "translate(50%)",
                 fontSize: 12,
             }}>
-                <select 
+                <select
                     value={data.item}
                     disabled={hasConnection}
                     onChange={e => updateData({ item: RESOURCE_ITEMS[e.target.selectedIndex] })}
@@ -84,10 +84,10 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                         </option>
                     ))}
                 </select>
-                <input 
-                    type="number" 
-                    min="0" 
-                    value={data.rate} 
+                <input
+                    type="number"
+                    min="0"
+                    value={data.rate}
                     onChange={e => updateData({ rate: +e.target.value })}
                     css={{
                         marginTop: 8,

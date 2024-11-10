@@ -3,10 +3,10 @@
  * Specifically, it uses these two sources:
  * - https://satisfactory.wiki.gg/wiki/Template:DocsRecipes.json?action=edit
  * - https://satisfactory.wiki.gg/wiki/Template:DocsItems.json?action=edit
- * 
- * The script expects them as `raw-recipes.json` and `raw-items.json` in the same directory. It 
- * generates `src/gamedata/{items,recipes}.ts`.    
- * 
+ *
+ * The script expects them as `raw-recipes.json` and `raw-items.json` in the same directory. It
+ * generates `src/gamedata/{items,recipes}.ts`.
+ *
  * Run as `deno run --allow-read --allow-write data/gen.ts`.
  */
 
@@ -174,7 +174,7 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
         // - `className` is always the same as the key in the object.
         // - The objects in `ingredients` always look like `{ item: string; amount: number }`.
 
-        // Skip all recipes that cannot be automated. Also unpack the array that's 
+        // Skip all recipes that cannot be automated. Also unpack the array that's
         // always of length 0 or 1.
         if (info.producedIn.length === 0) {
             continue;
@@ -185,7 +185,7 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
         if (info.seasons.length > 0) {
             continue;
         }
-        // Unfortunately, there are some recipes not marked with `seasons`, but which have these 
+        // Unfortunately, there are some recipes not marked with `seasons`, but which have these
         // FICSMAS items as input.
         const dependOnFicsmas = [
             "Recipe_Fireworks_01_C",
@@ -200,14 +200,14 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
         if (info.stable !== true) {
             continue;
         }
-        
+
 
         const building = BUILDING_MAPPING[producedIn];
         if (building == null) {
             throw new Error(`Unknown building: ${producedIn}`);
         }
 
-        // Generate nice ID for our usages. The ID from the JSON is ugly and contains useless 
+        // Generate nice ID for our usages. The ID from the JSON is ugly and contains useless
         // information.
         const customMapping = {
             "TempRecipe_NuclearWaste_C": "nuclear-waste",
@@ -216,7 +216,7 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
         };
         const id = customMapping[rawKey]
             ?? info.name.toLowerCase().replace(/ /g, '-').replace(/[()]/g, '');
-        
+
         const mapItemId = (item: { item: RawItemId; amount: number }) => ({
             item: items[item.item].id,
             amount: item.amount,
@@ -228,7 +228,7 @@ const readRecipes = (rawText: string, items: Items): Recipes => {
             duration: info.duration,
             producedIn: building,
             alternative: info.alternate,
-            ...info.minPower != null && info.maxPower != null && { 
+            ...info.minPower != null && info.maxPower != null && {
                 powerRequirements: [info.minPower, info.maxPower],
             },
             inputs: info.ingredients.map(mapItemId),

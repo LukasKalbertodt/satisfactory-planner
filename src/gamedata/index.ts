@@ -46,7 +46,7 @@ export type IoEntry = {
 };
 
 /** All buildings that can run recipes. */
-type ProductionBuilding = 
+type ProductionBuilding =
     | "smelter"
     | "foundry"
     | "constructor"

@@ -18,7 +18,7 @@ export const Header = () => {
             fontSize: 22,
             padding: "2px 16px",
         }}>Satisfactory Planner</h1>
-        
+
         <nav css={{
             ...overlayCss,
             right: 0,
@@ -73,9 +73,9 @@ const ShareButton = () => {
 };
 
 const InfoButton = () => {
-    return <MenuEntry 
-        label="About" 
-        icon={<LuInfo />} 
+    return <MenuEntry
+        label="About"
+        icon={<LuInfo />}
         onClick={() => alert("TODO")}
     />
 };

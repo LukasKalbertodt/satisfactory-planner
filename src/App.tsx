@@ -17,7 +17,7 @@ import { calcNewNodeMenuPos, NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
 import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
 import {
-    connectionToHandles, edgeIdToHandlePair, fromFlowNodeId, handlePairToEdgeId, toFlowHandleId, 
+    connectionToHandles, edgeIdToHandlePair, fromFlowNodeId, handlePairToEdgeId, toFlowHandleId,
     toFlowNodeId, useEventListener,
 } from './util';
 import { EDGE_TYPES, MainEdge } from './edges';
@@ -31,7 +31,7 @@ import { useImmer } from 'use-immer';
 export default function App() {
     const ref = useRef<HTMLDivElement>(null);
 
-    const { 
+    const {
         graph, removeNode, addEdge, removeEdge, updateNodePos,
     } = useStore(useShallow(state => ({
         graph: state.graph,
@@ -40,13 +40,13 @@ export default function App() {
         removeEdge: state.removeEdge,
         updateNodePos: state.updateNodePos,
     })));
-    
+
     // Node selection is not something we would want to persist or that should be part of the
     // undo/redo history. So we track it here, outside of our state.
     const [selectedNodes, setSelectedNodes] = useImmer<Set<string>>(new Set());
     const [selectedEdges, setSelectedEdges] = useImmer<Set<string>>(new Set());
-    
-    
+
+
     // Register undo/redo shortcuts
     const { undo, redo, pause, resume } = useStore.temporal.getState();
     useEventListener("keydown", (event: KeyboardEvent) => {
@@ -88,7 +88,7 @@ export default function App() {
                     }
                     break;
                 }
-                
+
                 // None of our nodes is resizable and it seems like we can safely ignore
                 // these events.
                 case "dimensions": break;
@@ -102,7 +102,7 @@ export default function App() {
                         }
                     });
                     break;
-                    
+
                 default:
                     console.warn(`Unhandled ${change.type} node event!`, change);
             }
@@ -156,14 +156,14 @@ export default function App() {
                 position: node.pos,
                 selected: selectedNodes.has(toFlowNodeId(id)),
                 ...node.match({
-                    recipe: (node, type) => ({ type, data: { 
+                    recipe: (node, type) => ({ type, data: {
                         recipeId: node.recipe,
                         buildingsCount: node.buildingsCount,
                         overclock: node.overclock,
                     }}),
                     splitter: (_node, type) => ({ type, data: {} }),
                     merger: (_node, type) => ({ type, data: {} }),
-                    source: (node, type) => ({ type, data: { 
+                    source: (node, type) => ({ type, data: {
                         item: node.item,
                         rate: node.rate,
                     }}),

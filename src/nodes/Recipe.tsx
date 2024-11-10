@@ -21,7 +21,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
         graph: state.graph,
         setRecipeNodeData: state.setRecipeNodeData,
     })));
-    const updateData = (update: Partial<RecipeNodeData>) => 
+    const updateData = (update: Partial<RecipeNodeData>) =>
         setRecipeNodeData(fromFlowNodeId(id), update);
 
     const recipe = RECIPES[data.recipeId];
@@ -49,7 +49,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 outline: "2px solid #efc74f",
             },
         }}>
-            <div css={{ 
+            <div css={{
                 height: 46,
                 paddingBottom: 4,
                 marginBottom: 4,
@@ -62,13 +62,13 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                     paddingTop: 2,
                     fontFamily: "Hubot Sans",
                 }}>
-                    <BuildingsCount 
-                        count={data.buildingsCount} 
-                        setCount={count => updateData({ buildingsCount: count })} 
+                    <BuildingsCount
+                        count={data.buildingsCount}
+                        setCount={count => updateData({ buildingsCount: count })}
                     />
-                    <Overclock 
-                        overclock={data.overclock} 
-                        setOverclock={overclock => updateData({ overclock })} 
+                    <Overclock
+                        overclock={data.overclock}
+                        setOverclock={overclock => updateData({ overclock })}
                     />
                     <div />
                 </div>
@@ -84,18 +84,18 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 fontSize: 10,
                 gap: 8,
                 "> div": {
-                    flex: "1 1 100%", 
+                    flex: "1 1 100%",
                 }
             }}>
                 <div>
                     {recipe.inputs.map((input, idx) => (
-                        <IoEntry 
+                        <IoEntry
                             key={idx}
                             idx={idx}
-                            itemId={input.item} 
-                            rate={amountToRate(input.amount)} 
+                            itemId={input.item}
+                            rate={amountToRate(input.amount)}
                             totalRate={totalMultiplier * amountToRate(input.amount)}
-                            kind="input" 
+                            kind="input"
                             isConnectable={
                                 !graphNode.incomingEdges.has(recipeHandleIdFor(idx, "input"))
                             }
@@ -104,11 +104,11 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 </div>
                 <div>
                     {recipe.outputs.map((output, idx) => (
-                        <IoEntry 
-                            key={idx} 
+                        <IoEntry
+                            key={idx}
                             idx={idx}
-                            itemId={output.item} 
-                            rate={amountToRate(output.amount)} 
+                            itemId={output.item}
+                            rate={amountToRate(output.amount)}
                             totalRate={totalMultiplier * amountToRate(output.amount)}
                             kind="output"
                             isConnectable={
@@ -146,18 +146,18 @@ const IoEntry = ({ idx, itemId, kind, rate, totalRate, isConnectable }: IoEntryP
             position: "absolute",
             [kind === "input" ? "right" : "left"]: "calc(100% + 15px)",
         }}>{totalRate.toString().slice(0, 6)}</div>
-        <Handle 
+        <Handle
             id={toFlowHandleId(recipeHandleIdFor(idx, kind))}
             isConnectable={isConnectable}
-            type={kind === "input" ? "target" : "source"} 
+            type={kind === "input" ? "target" : "source"}
             position={kind === "input" ? Position.Left : Position.Right}
-            css={{ 
+            css={{
                 [kind === "input" ? "left" : "right"]: -8.5,
                 ...handleCss,
             }}
         />
-        <img 
-            src={itemIcon(itemId)} 
+        <img
+            src={itemIcon(itemId)}
             css={{ height: "100%"}}
         />
         <div css={{
@@ -193,7 +193,7 @@ const BuildingsCount = ({ count, setCount }: BuildingsCountProps) => {
         }
         setCount(Math.min(999, Math.max(1, num)));
     };
-    
+
     return (
         <div css={{
             "--border-color": "#bbb",
@@ -238,24 +238,24 @@ const BuildingsCount = ({ count, setCount }: BuildingsCountProps) => {
                 },
             },
         }}>
-           
+
             <button onClick={() => setCount(count - 1)} disabled={count === 1}>
                 <LuMinus />
             </button>
             <div css={{  height: "100%", display: "flex", alignItems: "center", minWidth: 28 }}>
-                {/* We auto-size the `input` field by having a hidden span, which influence the 
+                {/* We auto-size the `input` field by having a hidden span, which influence the
                     size of the parent div */}
-                <div css={{ 
-                    position: "relative", 
+                <div css={{
+                    position: "relative",
                     height: "100%",
                     display: "inline-block",
                     "& > *": {
                         padding: "0 2px",
                     },
                 }}>
-                    <input 
+                    <input
                         type="text"
-                        value={count} 
+                        value={count}
                         maxLength={3}
                         onBeforeInput={(e: React.CompositionEvent<HTMLInputElement>) => {
                             const v = e.data;
@@ -343,5 +343,5 @@ const Overclock = ({ overclock, setOverclock }: OverclockProps) => {
                 </div>
             )}
         </div>
-    );    
+    );
 };

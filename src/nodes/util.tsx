@@ -52,9 +52,9 @@ type CombinerNodeProps = React.PropsWithChildren<{
 
 export const CombinerNode = ({ children, selected, kind }: CombinerNodeProps) => {
     const { normal, hover } = nodeColor(kind);
-    
+
     return (
-    
+
         <div css={{
             width: 25,
             height: 25,
@@ -74,7 +74,7 @@ export const CombinerNode = ({ children, selected, kind }: CombinerNodeProps) =>
             }}>
                 {children}
             </div>
-            <div css={{ 
+            <div css={{
                 position: "relative",
                 fontSize: 20,
                 lineHeight: 1,

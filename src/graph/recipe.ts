@@ -1,6 +1,6 @@
 import { Position, XYPosition } from "@xyflow/react";
 import { immerable } from "immer";
-import { GraphHandleId } from ".";
+import { GraphHandleId, GraphJson } from ".";
 import { IoEntry, RecipeId, RECIPES } from "../gamedata";
 import { match, notNullish } from "../util";
 import { GraphNode } from "./node";
@@ -46,5 +46,13 @@ export class RecipeGraphNode extends GraphNode {
             : [RECIPES[this.recipe].outputs, handle - 4];
 
         return notNullish(xputs[idx]);
+    }
+
+    toJSON(): GraphJson["nodes"][string] {
+        const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;
+        return {
+            type: this.type(),
+            ...rest,
+        };
     }
 }

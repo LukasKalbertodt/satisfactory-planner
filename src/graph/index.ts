@@ -1,8 +1,13 @@
-import { bug, notNullish } from "../util";
+import { bug, matchTag, notNullish } from "../util";
+import Ajv, { JTDDataType } from "ajv/dist/jtd";
 import { NODE_TYPES } from "../nodes";
 import { immerable } from "immer";
 import { type GraphNode } from "./node";
-import { ItemId } from "../gamedata";
+import { ItemId, RecipeId, RECIPES, RESOURCE_ITEMS } from "../gamedata";
+import { RecipeGraphNode } from "./recipe";
+import { SourceGraphNode } from "./source";
+import { SplitterGraphNode } from "./splitter";
+import { MergerGraphNode } from "./merger";
 
 
 export type GraphNodeId = number & { readonly __tag: unique symbol };
@@ -32,7 +37,6 @@ export class Graph {
     nodes: Map<GraphNodeId, GraphNode> = new Map();
 
     nodeIdCounter: number = 0;
-    edgeIdCounter: number = 0;
 
     node(id: GraphNodeId, kind?: string): GraphNode {
         return notNullish(
@@ -47,8 +51,8 @@ export class Graph {
                 const n = this.node(node);
                 return n.match({
                     recipe: (node) => node.entry(handle).item,
-                    merger: (node) => undefined,
-                    splitter: (node) => undefined,
+                    merger: () => undefined,
+                    splitter: () => undefined,
                     source: (node) => node.item,
                 });
             };
@@ -140,4 +144,132 @@ export class Graph {
         sourceNode.outgoingEdges.delete(source.handle);
         targetNode.incomingEdges.delete(target.handle);
     }
+
+    toJSON(): GraphJson {
+        const out: GraphJson = {
+            nodes: {},
+            edges: [],
+        };
+        for (const [id, node] of this.nodes) {
+            out.nodes[id.toString()] = node.toJSON();
+            for (const [handle, target] of node.outgoingEdges) {
+                out.edges.push({
+                    source: { node: id, handle },
+                    target,
+                });
+            }
+        }
+
+        return out;
+    }
+
+    static fromJSON(data: unknown): Graph {
+        if (!validateGraphJson(data)) {
+            console.log("Raw data that failed to validate:", data);
+            console.error(validateGraphJson.errors);
+            throw new Error("Validation failed when loading graph data");
+        }
+
+        const out = new Graph();
+        for (const [rawId, jsonNode] of Object.entries(data.nodes)) {
+            const id = parseInt(rawId) as GraphNodeId;
+            if (isNaN(id)) {
+                throw new Error("invalid node id");
+            }
+            out.nodeIdCounter = Math.max(out.nodeIdCounter, id);
+
+            const pos = jsonNode.pos;
+            out.nodes.set(id as GraphNodeId, matchTag(jsonNode, "type", {
+                "recipe": jsonNode => {
+                    const n = new RecipeGraphNode(jsonNode.recipe, pos);
+                    n.buildingsCount = jsonNode.buildingsCount;
+                    n.overclock = jsonNode.overclock;
+                    return n;
+                },
+                "source": jsonNode => new SourceGraphNode(jsonNode.item, jsonNode.rate, pos),
+                "splitter": () => new SplitterGraphNode(pos),
+                "merger": () => new MergerGraphNode(pos),
+            }));
+        }
+
+        out.nodeIdCounter += 1;
+
+        for (const edge of data.edges) {
+            out.addEdge(
+                new GraphHandle(edge.source.node as GraphNodeId, edge.source.handle as GraphHandleId),
+                new GraphHandle(edge.target.node as GraphNodeId, edge.target.handle as GraphHandleId),
+            );
+        }
+
+        return out;
+    }
 }
+
+const ajv = new Ajv();
+
+export type GraphJson = JTDDataType<typeof graphSchema>;
+
+const graphSchema = {
+    definitions: {
+        pos: {
+            properties: {
+                x: {type: "int32" },
+                y: {type: "int32" },
+            },
+        },
+    },
+    properties: {
+        nodes: {
+            values: {
+                discriminator: "type",
+                mapping: {
+                    "recipe": {
+                        properties: {
+                            pos: { ref: "pos" },
+                            recipe: { enum: Object.keys(RECIPES) as RecipeId[] },
+                            buildingsCount: { type: "uint32" },
+                            overclock: { type: "float32" },
+                        },
+                    },
+                    "source": {
+                        properties: {
+                            pos: { ref: "pos" },
+                            item: { enum: RESOURCE_ITEMS },
+                            rate: { type: "float32" },
+                        },
+                    },
+                    "splitter": {
+                        properties: {
+                            pos: { ref: "pos" },
+                        },
+                    },
+                    "merger": {
+                        properties: {
+                            pos: { ref: "pos" },
+                        },
+                    },
+                },
+            },
+        },
+        edges: {
+            elements: {
+                properties: {
+                    source: {
+                        properties: {
+                            node: { type: "uint32" },
+                            handle: { type: "uint32" },
+                        },
+                    },
+                    target: {
+                        properties: {
+                            node: { type: "uint32" },
+                            handle: { type: "uint32" },
+                        },
+                    },
+                },
+            },
+        },
+    },
+} as const;
+
+const validateGraphJson = ajv.compile<GraphJson>(graphSchema)

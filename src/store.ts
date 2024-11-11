@@ -10,6 +10,7 @@ import { GraphNode } from "./graph/node";
 import { bug } from "./util";
 import { SourceGraphNode } from "./graph/source";
 import { RecipeGraphNode } from "./graph/recipe";
+import { persist, PersistStorage } from "zustand/middleware";
 
 
 export type State = {
@@ -68,38 +69,37 @@ const stateInit = immer<State & Actions>(set => ({
     }),
 }));
 
+
+// Custom storage engine to do custom serialization/deserialization.
+const storage: PersistStorage<State & Actions> = {
+    getItem: name => {
+        const str = localStorage.getItem(name);
+        if (!str) {
+            return null;
+        }
+        const json = JSON.parse(str);
+        const { state } = json;
+        return {
+            ...json,
+            state: {
+                ...state,
+                graph: Graph.fromJSON(state.graph),
+            },
+        };
+    },
+    setItem: (name, value) => {
+        localStorage.setItem(name, JSON.stringify(value));
+    },
+    removeItem: name => {
+        localStorage.removeItem(name);
+    },
+};
+
 export const useStore = create<State & Actions>()(
     temporal(
-        stateInit,
-        // persist(stateInit, {
-        //     name: "satisfactory-planner", // TODO
-        //     partialize: (state) => { console.log(state); return ({
-        //         ...state,
-        //         nodes: state.nodes.map(nodeCore),
-        //         edges: state.edges.map(edgeCore),
-        //     })},
-        // }),
+        persist(stateInit, {
+            name: "satisfactory-planner", // TODO
+            storage: storage,
+        }),
     ),
 );
-
-
-// /** Node properties that are part of the persisted store. */
-// export type NodeCore = Pick<FlowNode, "id" | "position" | "data">
-//     & { type: keyof typeof NODE_TYPES };
-
-// export type EdgeCore = Pick<MainEdge, "id" | "source" | "sourceHandle" | "target" | "targetHandle">;
-
-
-// const nodeCore = (node: FlowNode): NodeCore => ({
-//     id: node.id,
-//     type: node.type,
-//     position: node.position,
-//     data: node.data,
-// });
-// const edgeCore = (edge: MainEdge): EdgeCore => ({
-//     id: edge.id,
-//     source: edge.source,
-//     sourceHandle: edge.sourceHandle,
-//     target: edge.target,
-//     targetHandle: edge.targetHandle,
-// });

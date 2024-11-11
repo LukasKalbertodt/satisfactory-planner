@@ -1,11 +1,11 @@
 import { XYPosition } from "@xyflow/react";
-import { match, notNullish, unreachable } from "../util";
+import { match, unreachable } from "../util";
 import { immerable } from "immer";
 import { type RecipeGraphNode } from "./recipe";
 import { type MergerGraphNode } from "./merger";
 import { type SplitterGraphNode } from "./splitter";
 import { type SourceGraphNode } from "./source";
-import { GraphHandle, GraphHandleId, NodeTypes } from ".";
+import { GraphHandle, GraphHandleId, GraphJson, NodeTypes } from ".";
 
 
 export abstract class GraphNode {
@@ -33,7 +33,7 @@ export abstract class GraphNode {
     }
     neighbors(): GraphHandle[] {
         return [...this.upstreamNeighbors(), ...this.downstreamNeighbors()];
-    };
+    }
     isHandleConnected(handle: GraphHandleId): boolean {
         return this.incomingEdges.has(handle) || this.outgoingEdges.has(handle);
     }
@@ -54,4 +54,6 @@ export abstract class GraphNode {
             "source": () => cases.source(this as unknown as SourceGraphNode, "source"),
         }, unreachable);
     }
+
+    abstract toJSON(): GraphJson["nodes"][string];
 }

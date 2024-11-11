@@ -1,6 +1,6 @@
 import { immerable } from "immer";
 import { Position } from "@xyflow/react";
-import { GraphHandleId } from ".";
+import { GraphHandleId, GraphJson } from ".";
 import { match, unreachable } from "../util";
 import { GraphNode } from "./node";
 
@@ -27,5 +27,13 @@ export class SplitterGraphNode extends GraphNode {
     }
     outputs(): GraphHandleId[] {
         return SPLITTER_OUTPUTS;
+    }
+
+    toJSON(): GraphJson["nodes"][string] {
+        const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;
+        return {
+            type: this.type(),
+            ...rest,
+        };
     }
 }

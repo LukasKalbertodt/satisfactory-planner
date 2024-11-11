@@ -102,6 +102,21 @@ export function match<T extends string | number, Out>(
         : (arms[value] as (() => Out) | undefined ?? fallback)();
 }
 
+export function matchTag<
+    Tag extends string,
+    Obj extends Record<Tag, number | string>,
+    Out,
+>(
+    obj: Obj,
+    tag: Tag,
+    arms: {
+        [Key in Obj[Tag]]: (value: Extract<Obj, Record<Tag, Key>>) => Out
+    },
+): Out {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return arms[obj[tag]](obj as any);
+}
+
 /**
  * A custom error type that represents bugs: errors that are not expected and
  * that cannot be handled. They are caused by a bug in our code and not by the

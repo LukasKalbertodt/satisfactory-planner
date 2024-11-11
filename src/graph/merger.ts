@@ -1,5 +1,5 @@
 import { immerable } from "immer";
-import { GraphHandleId } from ".";
+import { GraphHandleId, GraphJson } from ".";
 import { Position } from "@xyflow/react";
 import { match, unreachable } from "../util";
 import { GraphNode } from "./node";
@@ -27,5 +27,13 @@ export class MergerGraphNode extends GraphNode {
     }
     outputs(): GraphHandleId[] {
         return MERGER_OUTPUTS;
+    }
+
+    toJSON(): GraphJson["nodes"][string] {
+        const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;
+        return {
+            type: this.type(),
+            ...rest,
+        };
     }
 }

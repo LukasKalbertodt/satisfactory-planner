@@ -3,8 +3,6 @@ import { immer } from "zustand/middleware/immer";
 import { XYPosition } from "@xyflow/react";
 import { temporal } from 'zundo';
 
-import { RecipeNodeData } from "./nodes/Recipe";
-import { SourceNodeData } from "./nodes/Source";
 import { Graph, GraphHandle, GraphNodeId } from "./graph";
 import { GraphNode } from "./graph/node";
 import { bug } from "./util";
@@ -23,8 +21,8 @@ type Actions = {
     addEdge: (source: GraphHandle, target: GraphHandle) => void;
     removeEdge: (source: GraphHandle, target: GraphHandle) => void;
     updateNodePos: (id: GraphNodeId, pos: XYPosition) => void;
-    setRecipeNodeData: (node: GraphNodeId, data: Partial<RecipeNodeData>) => void;
-    setSourceNodeData: (node: GraphNodeId, data: Partial<SourceNodeData>) => void;
+    setRecipeNodeData: (node: GraphNodeId, data: Partial<RecipeGraphNode>) => void;
+    setSourceNodeData: (node: GraphNodeId, data: Partial<SourceGraphNode>) => void;
 };
 
 const initialState: State = {
@@ -55,7 +53,7 @@ const stateInit = immer<State & Actions>(set => ({
         if (!(node instanceof RecipeGraphNode)) {
             return bug("node is not a source node");
         }
-        node.recipe = data.recipeId ?? node.recipe;
+        node.recipeId = data.recipeId ?? node.recipeId;
         node.buildingsCount = data.buildingsCount ?? node.buildingsCount;
         node.overclock = data.overclock ?? node.overclock;
     }),

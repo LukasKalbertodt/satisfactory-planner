@@ -157,15 +157,14 @@ export default function App() {
                 selected: selectedNodes.has(toFlowNodeId(id)),
                 ...node.match({
                     recipe: (node, type) => ({ type, data: {
-                        recipeId: node.recipe,
-                        buildingsCount: node.buildingsCount,
-                        overclock: node.overclock,
+                        graphId: id,
+                        node,
                     }}),
                     splitter: (_node, type) => ({ type, data: {} }),
                     merger: (_node, type) => ({ type, data: {} }),
                     source: (node, type) => ({ type, data: {
-                        item: node.item,
-                        rate: node.rate,
+                        graphId: id,
+                        node,
                     }}),
                 }),
             }))}

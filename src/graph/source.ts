@@ -22,7 +22,7 @@ export class SourceGraphNode extends GraphNode {
     inputs(): GraphHandleId[] {
         return [];
     }
-    outputs(): GraphHandleId[] {
+    outputs(): [GraphHandleId] {
         return [0 as GraphHandleId];
     }
 

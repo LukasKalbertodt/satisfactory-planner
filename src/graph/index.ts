@@ -87,6 +87,42 @@ export class Graph {
             || sourceItem === targetItem;
     }
 
+    expectedOutputRate(handle: GraphHandle): number | undefined {
+        const otherSide = this.node(handle.node).outgoingEdges.get(handle.handle);
+        if (!otherSide) {
+            return undefined;
+        }
+
+        // DFS
+        const visited = new Set<GraphHandle>();
+        const stack = [otherSide];
+        let sum = 0;
+        while (stack.length > 0) {
+            const curr = stack.pop()!;
+            const n = this.node(curr.node);
+
+            if (n instanceof RecipeGraphNode) {
+                sum += n.entry(curr.handle).totalRate;
+                continue;
+            } else if (n.type() === "merger" && n.incomingEdges.size > 1) {
+                // Once we reach a merger with multiple inputs, we cannot proceed. The merger
+                // cannot define a clear expectation, as it just has a "total expectation",
+                // that has to be covered by the sum of inputs. For those mergers, we instead
+                // show the diff on their output.
+                return undefined;
+            }
+
+            if (visited.has(curr)) {
+                bug("cycle detected");
+            }
+            visited.add(curr);
+
+            n.outgoingEdges.forEach((handle) => stack.push(handle));
+        }
+
+        return sum;
+    }
+
     addNode(node: GraphNode): GraphNodeId {
         const id = this.nodeIdCounter as GraphNodeId;
         this.nodeIdCounter += 1;

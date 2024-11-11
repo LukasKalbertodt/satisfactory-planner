@@ -33,9 +33,9 @@ export const rateCss = {
 export const totalRateCss = {
     ...rateCss,
     background: "rgba(255, 255, 255, 0.8)",
-    color: "#30336b",
     padding: "1px 2px",
-};
+    whiteSpace: "nowrap",
+} as const;
 
 export const settingsPopoverCss = {
     background: "white",
@@ -43,6 +43,30 @@ export const settingsPopoverCss = {
     border: "1px solid #aaa",
     boxShadow: "0 0 8px rgba(0, 0, 0, 0.4)",
     padding: 4,
+};
+
+type RateDiffProps = {
+    expected: number | undefined;
+    actual: number;
+};
+
+export const RateDiff = ({ expected, actual }: RateDiffProps) => {
+    if (expected === undefined) {
+        return null;
+    }
+
+    const diff = actual - expected;
+    const [label, color] = (() => {
+        if (diff === 0) {
+            return ["±0", "#27ae60"];
+        } else if (diff > 0) {
+            return [`+${diff}`, "#2481bf"];
+        } else {
+            return [`-${-diff}`, "#ec1818"];
+        }
+    })();
+
+    return <span css={{ color }}>{` (${label})`}</span>;
 };
 
 type CombinerNodeProps = React.PropsWithChildren<{

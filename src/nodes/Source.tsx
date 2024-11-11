@@ -1,23 +1,28 @@
-import { type Node, Handle, NodeProps, Position, useEdges } from "@xyflow/react";
+import { type Node, Handle, NodeProps, Position } from "@xyflow/react";
+import { useShallow } from 'zustand/shallow';
 
-import { handleCss, settingsPopoverCss, totalRateCss } from "./util";
-import { fromFlowNodeId, itemIcon } from "../util";
-import { ITEMS, RESOURCE_ITEMS, ResourceItem } from "../gamedata";
+import { handleCss, RateDiff, settingsPopoverCss, totalRateCss } from "./util";
+import { itemIcon } from "../util";
+import { ITEMS, RESOURCE_ITEMS } from "../gamedata";
 import { useStore } from "../store";
+import { GraphHandle, GraphNodeId } from "../graph";
+import { SourceGraphNode } from "../graph/source";
 
 
 export type SourceNodeData = {
-    item: ResourceItem;
-    rate: number;
+    graphId: GraphNodeId;
+    node: SourceGraphNode;
 };
 export type SourceNode = Node<SourceNodeData, "source">;
 
-export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
-    const setData = useStore(store => store.setSourceNodeData);
-    const updateData = (update: Partial<SourceNodeData>) =>
-        setData(fromFlowNodeId(id), update);
-    const edges = useEdges();
-    const hasConnection = edges.some(edge => edge.source === id);
+export const SourceNode = ({ selected, data: { node, graphId } }: NodeProps<SourceNode>) => {
+    const { setData, graph } = useStore(useShallow(store => ({
+        setData: store.setSourceNodeData,
+        graph: store.graph,
+    })));
+    const updateData = (update: Partial<SourceGraphNode>) => setData(graphId, update);
+    const hasConnection = node.outgoingEdges.size > 0;
+    const expectedRate = graph.expectedOutputRate(new GraphHandle(graphId, node.outputs()[0]));
 
     return <div css={{ width: 25, height: 25, position: "relative" }}>
         <div css={{
@@ -33,7 +38,7 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
             },
         }}>
             <img
-                src={itemIcon(data.item)}
+                src={itemIcon(node.item)}
                 css={{ height: "100%"}}
             />
             <div css={{
@@ -44,7 +49,8 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 transform: "translateY(-50%)",
                 fontSize: 10,
             }}>
-                {data.rate}
+                {node.rate}
+                <RateDiff expected={expectedRate} actual={node.rate} />
             </div>
             <div css={{
                 position: "absolute",
@@ -54,7 +60,7 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 fontSize: 12,
                 textAlign: "center",
             }}>
-                {ITEMS[data.item].name}
+                {ITEMS[node.item].name}
             </div>
             <Handle
                 type="source"
@@ -74,7 +80,7 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 fontSize: 12,
             }}>
                 <select
-                    value={data.item}
+                    value={node.item}
                     disabled={hasConnection}
                     onChange={e => updateData({ item: RESOURCE_ITEMS[e.target.selectedIndex] })}
                 >
@@ -87,7 +93,7 @@ export const SourceNode = ({ id, selected, data }: NodeProps<SourceNode>) => {
                 <input
                     type="number"
                     min="0"
-                    value={data.rate}
+                    value={node.rate}
                     onChange={e => updateData({ rate: +e.target.value })}
                     css={{
                         marginTop: 8,

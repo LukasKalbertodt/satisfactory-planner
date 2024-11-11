@@ -1,33 +1,27 @@
 import { type Node, Handle, NodeProps, Position } from "@xyflow/react";
-import { ItemId, ITEMS, RecipeId, RECIPES } from "../gamedata";
+import { ItemId, ITEMS } from "../gamedata";
 import { useState } from "react";
-import { fromFlowNodeId, itemIcon, toFlowHandleId } from "../util";
-import { handleCss, rateCss, settingsPopoverCss, totalRateCss } from "./util";
+import { itemIcon, toFlowHandleId } from "../util";
+import { handleCss, rateCss, RateDiff, settingsPopoverCss, totalRateCss } from "./util";
 import { useStore } from "../store";
 import { LuMinus, LuPlus } from "react-icons/lu";
 import { useShallow } from "zustand/shallow";
-import { recipeHandleIdFor } from "../graph/recipe";
+import { RecipeGraphNode, recipeHandleIdFor } from "../graph/recipe";
+import { GraphHandle, GraphNodeId } from "../graph";
 
 
 export type RecipeNodeData = {
-    recipeId: RecipeId;
-    buildingsCount: number;
-    overclock: number;
+    graphId: GraphNodeId;
+    node: RecipeGraphNode;
 };
 export type RecipeNode = Node<RecipeNodeData, "recipe">;
 
-export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
+export const RecipeNode = ({ data: { node, graphId }, selected }: NodeProps<RecipeNode>) => {
     const { graph, setRecipeNodeData } = useStore(useShallow(state => ({
         graph: state.graph,
         setRecipeNodeData: state.setRecipeNodeData,
     })));
-    const updateData = (update: Partial<RecipeNodeData>) =>
-        setRecipeNodeData(fromFlowNodeId(id), update);
-
-    const recipe = RECIPES[data.recipeId];
-    const amountToRate = (amount: number) => amount / recipe.duration * 60;
-    const totalMultiplier = data.buildingsCount * data.overclock;
-    const graphNode = graph.node(fromFlowNodeId(id));
+    const updateData = (update: Partial<RecipeGraphNode>) => setRecipeNodeData(graphId, update);
 
     return (
         <div css={{
@@ -63,11 +57,11 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                     fontFamily: "Hubot Sans",
                 }}>
                     <BuildingsCount
-                        count={data.buildingsCount}
+                        count={node.buildingsCount}
                         setCount={count => updateData({ buildingsCount: count })}
                     />
                     <Overclock
-                        overclock={data.overclock}
+                        overclock={node.overclock}
                         setOverclock={overclock => updateData({ overclock })}
                     />
                     <div />
@@ -75,7 +69,7 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 <div css={{
                     fontFamily: "Hubot Sans",
                     fontWeight: "bold",
-                }}>{recipe.name}</div>
+                }}>{node.recipe().name}</div>
             </div>
             <div css={{
                 display: "flex",
@@ -88,32 +82,29 @@ export const RecipeNode = ({ id, data, selected }: NodeProps<RecipeNode>) => {
                 }
             }}>
                 <div>
-                    {recipe.inputs.map((input, idx) => (
+                    {node.inputEntries().map((entry, idx) => (
                         <IoEntry
                             key={idx}
                             idx={idx}
-                            itemId={input.item}
-                            rate={amountToRate(input.amount)}
-                            totalRate={totalMultiplier * amountToRate(input.amount)}
+                            itemId={entry.item}
+                            rate={entry.rate}
+                            totalRate={entry.totalRate}
                             kind="input"
-                            isConnectable={
-                                !graphNode.incomingEdges.has(recipeHandleIdFor(idx, "input"))
-                            }
+                            isConnectable={entry.connectedTo === null}
                         />
                     ))}
                 </div>
                 <div>
-                    {recipe.outputs.map((output, idx) => (
+                    {node.outputEntries().map((entry, idx) => (
                         <IoEntry
                             key={idx}
                             idx={idx}
-                            itemId={output.item}
-                            rate={amountToRate(output.amount)}
-                            totalRate={totalMultiplier * amountToRate(output.amount)}
+                            itemId={entry.item}
+                            rate={entry.rate}
+                            totalRate={entry.totalRate}
                             kind="output"
-                            isConnectable={
-                                !graphNode.outgoingEdges.has(recipeHandleIdFor(idx, "input"))
-                            }
+                            isConnectable={entry.connectedTo === null}
+                            expectedRate={graph.expectedOutputRate(new GraphHandle(graphId, entry.handle))}
                         />
                     ))}
                 </div>
@@ -127,11 +118,14 @@ type IoEntryProps = {
     itemId: ItemId;
     rate: number;
     totalRate: number;
+    expectedRate?: number;
     kind: "input" | "output";
     isConnectable: boolean;
 };
 
-const IoEntry = ({ idx, itemId, kind, rate, totalRate, isConnectable }: IoEntryProps) => (
+const IoEntry = ({
+    idx, itemId, kind, rate, totalRate, isConnectable, expectedRate,
+}: IoEntryProps) => (
     <div css={{
         position: "relative",
         height: 23,
@@ -145,7 +139,10 @@ const IoEntry = ({ idx, itemId, kind, rate, totalRate, isConnectable }: IoEntryP
             ...totalRateCss,
             position: "absolute",
             [kind === "input" ? "right" : "left"]: "calc(100% + 15px)",
-        }}>{totalRate.toString().slice(0, 6)}</div>
+        }}>
+            {totalRate.toString().slice(0, 6)}
+            <RateDiff expected={expectedRate} actual={totalRate} />
+        </div>
         <Handle
             id={toFlowHandleId(recipeHandleIdFor(idx, kind))}
             isConnectable={isConnectable}

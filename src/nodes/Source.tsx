@@ -95,10 +95,21 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                     ))}
                 </select>
                 <input
-                    type="number"
+                    type="text"
                     min="0"
-                    value={node.rate}
-                    onChange={e => updateData({ rate: +e.target.value })}
+                    defaultValue={node.rate}
+                    onBeforeInput={(e: React.CompositionEvent<HTMLInputElement>) => {
+                        const v = e.data;
+                        if (v !== "" && isNaN(Number(v))) {
+                            e.preventDefault();
+                        }
+                    }}
+                    onKeyDown={e => {
+                        if (e.key === "Enter") {
+                            updateData({ rate: +e.currentTarget.value })
+                        }
+                    }}
+                    onBlur={e => updateData({ rate: +e.target.value })}
                     css={{
                         marginTop: 8,
                         fontSize: 12,

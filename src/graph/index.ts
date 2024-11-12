@@ -51,36 +51,17 @@ export class Graph {
 
     isValidConnection(source: GraphHandle, target: GraphHandle): boolean {
         const getItem = (handle: GraphHandle): ItemId | undefined => {
-            const getDirectItem = ({ node, handle }: GraphHandle): ItemId | undefined => {
-                const n = this.node(node);
-                return n.match({
-                    recipe: (node) => node.entry(handle).item,
+            return this.dfs(handle, (handle, node) => {
+                const item = node.match({
+                    recipe: (node) => node.entry(handle.handle).item,
                     merger: () => undefined,
                     splitter: () => undefined,
                     source: (node) => node.item,
                 });
-            };
-
-            // DFS and take the first item we find
-            const visited = new Set<GraphHandle>();
-            const stack = [handle];
-            while (stack.length > 0) {
-                const curr = stack.pop()!;
-                const item = getDirectItem(curr);
-                if (item) {
-                    return item;
-                }
-
-                if (visited.has(curr)) {
-                    continue;
-                }
-                visited.add(curr);
-
-                const n = this.node(curr.node);
-                n.neighbors().forEach(h => stack.push(h));
-            }
-
-            return undefined;
+                return item
+                    ? ["stop", item]
+                    : ["continue", node.neighbors()];
+            });
         };
 
 
@@ -98,33 +79,52 @@ export class Graph {
         }
 
         // DFS
-        const visited = new Set<GraphHandle>();
-        const stack = [otherSide];
-        let sum = 0;
-        while (stack.length > 0) {
-            const curr = stack.pop()!;
-            const n = this.node(curr.node);
-
-            if (n instanceof RecipeGraphNode) {
-                sum += n.entry(curr.handle).totalRate;
-                continue;
-            } else if (n.type() === "merger" && n.incomingEdges.size > 1) {
-                // Once we reach a merger with multiple inputs, we cannot proceed. The merger
-                // cannot define a clear expectation, as it just has a "total expectation",
-                // that has to be covered by the sum of inputs. For those mergers, we instead
-                // show the diff on their output.
-                return undefined;
+        let out: number | undefined = 0;
+        this.dfs(otherSide, (handle, node) => {
+            // Once we reach a merger with multiple inputs, we cannot proceed. The merger
+            // cannot define a clear expectation, as it just has a "total expectation",
+            // that has to be covered by the sum of inputs. For those mergers, we instead
+            // show the diff on their output.
+            if (node.type() === "merger" && node.incomingEdges.size > 1) {
+                out = undefined;
+                return ["stop", undefined];
             }
 
+            // Recipe nodes add to the total sum, but we do not continue on their outgoing edges.
+            if (node instanceof RecipeGraphNode) {
+                out! += node.entry(handle.handle).totalRate;
+                return ["continue", []];
+            }
+
+            return ["continue", node.outgoingEdges.values()];
+        });
+
+        return out;
+    }
+
+    dfs<T>(
+        start: GraphHandle,
+        visit: (handle: GraphHandle, node: GraphNode)
+            => ["continue", Iterable<GraphHandle>] | ["stop", T]
+    ): T | undefined {
+        const visited = new Set<GraphHandle>();
+        const stack = [start];
+        while (stack.length > 0) {
+            const curr = stack.pop()!;
             if (visited.has(curr)) {
-                bug("cycle detected");
+                continue;
             }
             visited.add(curr);
 
-            n.outgoingEdges.forEach((handle) => stack.push(handle));
-        }
+            const node = this.node(curr.node);
+            const [controlFlow, payload] = visit(curr, node);
+            if (controlFlow === "stop") {
+                return payload;
+            }
 
-        return sum;
+            const neighbors = payload;
+            [...neighbors].forEach(h => stack.push(h));
+        }
     }
 
     addNode(node: GraphNode): GraphNodeId {

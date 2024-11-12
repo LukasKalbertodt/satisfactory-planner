@@ -28,6 +28,9 @@ export class MergerGraphNode extends GraphNode {
     outputs(): GraphHandleId[] {
         return MERGER_OUTPUTS;
     }
+    output(): GraphHandleId {
+        return MERGER_OUTPUTS[0];
+    }
 
     toJSON(): GraphJson["nodes"][string] {
         const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;

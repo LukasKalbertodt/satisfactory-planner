@@ -102,6 +102,38 @@ export class Graph {
         return out;
     }
 
+    incomingRate(handle: GraphHandle): number | undefined {
+        const otherSide = this.node(handle.node).incomingEdges.get(handle.handle);
+        if (!otherSide) {
+            return undefined;
+        }
+
+        // DFS
+        let out: number | undefined = 0;
+        this.dfs(otherSide, (handle, node) => {
+            // Once we reach a splitter with multiple outputs, we cannot proceed. The splitter
+            // cannot define a clear output for that handle, as its input can be split differently.
+            if (node.type() === "splitter" && node.outgoingEdges.size > 1) {
+                out = undefined;
+                return ["stop", undefined];
+            }
+
+            // Recipe nodes add to the total sum, but we do not continue on their outgoing edges.
+            if (node instanceof RecipeGraphNode) {
+                out! += node.entry(handle.handle).totalRate;
+                return ["continue", []];
+            }
+            if (node instanceof SourceGraphNode) {
+                out! += node.rate;
+                return ["continue", []];
+            }
+
+            return ["continue", node.incomingEdges.values()];
+        });
+
+        return out;
+    }
+
     dfs<T>(
         start: GraphHandle,
         visit: (handle: GraphHandle, node: GraphNode)

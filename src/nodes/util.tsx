@@ -28,11 +28,12 @@ export const handleCss = {
 export const rateCss = {
     fontFamily: "Hubot Sans",
     fontWeight: "bold",
+    fontSize: 10,
 } as const;
 
 export const totalRateCss = {
     ...rateCss,
-    background: "rgba(255, 255, 255, 0.8)",
+    background: "rgba(255, 255, 255, 0.7)",
     padding: "1px 2px",
     whiteSpace: "nowrap",
 } as const;
@@ -60,9 +61,9 @@ export const RateDiff = ({ expected, actual }: RateDiffProps) => {
         if (diff === 0) {
             return ["±0", "#27ae60"];
         } else if (diff > 0) {
-            return [`+${diff}`, "#2481bf"];
+            return [`+${diff.toString().slice(0, 6)}`, "#2481bf"];
         } else {
-            return [`-${-diff}`, "#ec1818"];
+            return [`-${(-diff).toString().slice(0, 6)}`, "#ec1818"];
         }
     })();
 

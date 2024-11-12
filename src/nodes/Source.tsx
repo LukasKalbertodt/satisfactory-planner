@@ -8,6 +8,7 @@ import { useStore } from "../store";
 import { GraphHandle } from "../graph";
 import { SourceGraphNode } from "../graph/source";
 import { NodeData } from ".";
+import { useRef } from "react";
 
 
 export type SourceNodeData = NodeData<SourceGraphNode>;
@@ -27,6 +28,7 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
     const updateData = (update: Partial<SourceGraphNode>) => setData(id, update);
     const hasConnection = node.outgoingEdges.size > 0;
     const expectedRate = graph.expectedOutputRate(new GraphHandle(id, node.outputs()[0]));
+    const rateInput = useRef<HTMLInputElement>(null);
 
     return <div css={{ width: 25, height: 25, position: "relative" }}>
         <div css={{
@@ -82,11 +84,13 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                 right: "50%",
                 transform: "translate(50%)",
                 fontSize: 12,
+                textAlign: "center",
             }}>
                 <select
                     value={node.item}
                     disabled={hasConnection}
                     onChange={e => updateData({ item: RESOURCE_ITEMS[e.target.selectedIndex] })}
+                    css={{ width: 150 }}
                 >
                     {RESOURCE_ITEMS.map(item => (
                         <option key={item} value={item}>
@@ -94,7 +98,37 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                         </option>
                     ))}
                 </select>
+                <div css={{
+                    margin: "8px 0",
+                    display: "flex",
+                    gap: 4,
+                    "& > button": {
+                        background: "#f2f2f2",
+                        border: "1px solid #ddd",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        "&:hover:not([disabled])": {
+                            background: "#e0e0e0",
+                            borderColor: "#bbb",
+                        },
+                        "&[disabled]": {
+                            borderColor: "#aaa",
+                        },
+                    },
+                }}>
+                    {[30, 60, 120, 240, 480, 960, 1200].map(rate => (
+                        <button
+                            disabled={rate === node.rate}
+                            key={rate}
+                            onClick={() => {
+                                updateData({ rate });
+                                rateInput.current!.value = rate.toString();
+                            }}
+                        >{rate}</button>
+                    ))}
+                </div>
                 <input
+                    ref={rateInput}
                     type="text"
                     min="0"
                     defaultValue={node.rate}
@@ -111,9 +145,8 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                     }}
                     onBlur={e => updateData({ rate: +e.target.value })}
                     css={{
-                        marginTop: 8,
                         fontSize: 12,
-                        width: "100%",
+                        width: 150,
                     }}
                 />
             </div>

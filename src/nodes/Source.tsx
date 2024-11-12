@@ -5,24 +5,28 @@ import { handleCss, RateDiff, settingsPopoverCss, totalRateCss } from "./util";
 import { itemIcon } from "../util";
 import { ITEMS, RESOURCE_ITEMS } from "../gamedata";
 import { useStore } from "../store";
-import { GraphHandle, GraphNodeId } from "../graph";
+import { GraphHandle } from "../graph";
 import { SourceGraphNode } from "../graph/source";
+import { NodeData } from ".";
 
 
-export type SourceNodeData = {
-    graphId: GraphNodeId;
-    node: SourceGraphNode;
-};
+export type SourceNodeData = NodeData<SourceGraphNode>;
 export type SourceNode = Node<SourceNodeData, "source">;
 
-export const SourceNode = ({ selected, data: { node, graphId } }: NodeProps<SourceNode>) => {
+export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNode>) => {
     const { setData, graph } = useStore(useShallow(store => ({
         setData: store.setSourceNodeData,
         graph: store.graph,
     })));
-    const updateData = (update: Partial<SourceGraphNode>) => setData(graphId, update);
+
+    // See the same check in Recipe node.
+    if (!graph.hasNode(id)) {
+        return null;
+    }
+
+    const updateData = (update: Partial<SourceGraphNode>) => setData(id, update);
     const hasConnection = node.outgoingEdges.size > 0;
-    const expectedRate = graph.expectedOutputRate(new GraphHandle(graphId, node.outputs()[0]));
+    const expectedRate = graph.expectedOutputRate(new GraphHandle(id, node.outputs()[0]));
 
     return <div css={{ width: 25, height: 25, position: "relative" }}>
         <div css={{

@@ -156,16 +156,10 @@ export default function App() {
                 position: node.pos,
                 selected: selectedNodes.has(toFlowNodeId(id)),
                 ...node.match({
-                    recipe: (node, type) => ({ type, data: {
-                        graphId: id,
-                        node,
-                    }}),
-                    splitter: (_node, type) => ({ type, data: {} }),
-                    merger: (_node, type) => ({ type, data: {} }),
-                    source: (node, type) => ({ type, data: {
-                        graphId: id,
-                        node,
-                    }}),
+                    recipe: (node, type) => ({ type, data: { id, node }}),
+                    splitter: (node, type) => ({ type, data: { node, id } }),
+                    merger: (node, type) => ({ type, data: { node, id } }),
+                    source: (node, type) => ({ type, data: { id, node }}),
                 }),
             }))}
             edges={(() => {

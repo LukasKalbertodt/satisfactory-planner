@@ -7,21 +7,29 @@ import { useStore } from "../store";
 import { LuMinus, LuPlus } from "react-icons/lu";
 import { useShallow } from "zustand/shallow";
 import { RecipeGraphNode, recipeHandleIdFor } from "../graph/recipe";
-import { GraphHandle, GraphNodeId } from "../graph";
+import { GraphHandle } from "../graph";
+import { NodeData } from ".";
 
 
-export type RecipeNodeData = {
-    graphId: GraphNodeId;
-    node: RecipeGraphNode;
-};
+export type RecipeNodeData = NodeData<RecipeGraphNode>;
 export type RecipeNode = Node<RecipeNodeData, "recipe">;
 
-export const RecipeNode = ({ data: { node, graphId }, selected }: NodeProps<RecipeNode>) => {
+export const RecipeNode = ({ data: { node, id }, selected }: NodeProps<RecipeNode>) => {
     const { graph, setRecipeNodeData } = useStore(useShallow(state => ({
         graph: state.graph,
         setRecipeNodeData: state.setRecipeNodeData,
     })));
-    const updateData = (update: Partial<RecipeGraphNode>) => setRecipeNodeData(graphId, update);
+    const updateData = (update: Partial<RecipeGraphNode>) => setRecipeNodeData(id, update);
+
+    // Work around the zombie child problem. When deleting nodes, for some reason, the node is
+    // still rendered once, but with `graph` alerady not containing it. This usually leads to
+    // null errors since nodes assume `graph.node(id)` to exist. We just return null since
+    // the result of this render won't be shown at all anyway.
+    //
+    // Also see: https://github.com/xyflow/xyflow/issues/2548
+    if (!graph.hasNode(id)) {
+        return null;
+    }
 
     return (
         <div css={{
@@ -104,7 +112,7 @@ export const RecipeNode = ({ data: { node, graphId }, selected }: NodeProps<Reci
                             totalRate={entry.totalRate}
                             kind="output"
                             isConnectable={entry.connectedTo === null}
-                            expectedRate={graph.expectedOutputRate(new GraphHandle(graphId, entry.handle))}
+                            expectedRate={graph.expectedOutputRate(new GraphHandle(id, entry.handle))}
                         />
                     ))}
                 </div>

@@ -45,6 +45,10 @@ export class Graph {
         );
     }
 
+    hasNode(id: GraphNodeId): boolean {
+        return this.nodes.has(id);
+    }
+
     isValidConnection(source: GraphHandle, target: GraphHandle): boolean {
         const getItem = (handle: GraphHandle): ItemId | undefined => {
             const getDirectItem = ({ node, handle }: GraphHandle): ItemId | undefined => {

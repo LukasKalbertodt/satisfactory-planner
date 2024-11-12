@@ -1,16 +1,23 @@
 import { type Node, Handle, NodeProps } from "@xyflow/react";
 
 import { CombinerNode, handleCss } from "./util";
-import { SPLITTER_INPUTS, SPLITTER_OUTPUTS, splitterHandlePos } from "../graph/splitter";
-import { fromFlowNodeId, toFlowHandleId } from "../util";
+import { SPLITTER_INPUTS, SPLITTER_OUTPUTS, SplitterGraphNode, splitterHandlePos } from "../graph/splitter";
+import { toFlowHandleId } from "../util";
 import { useStore } from "../store";
+import { NodeData } from ".";
 
 
-export type SplitterNodeData = Record<string, never>;
+export type SplitterNodeData = NodeData<SplitterGraphNode>;
 export type SplitterNode = Node<SplitterNodeData, "splitter">;
 
-export const SplitterNode = ({ selected, id }: NodeProps<SplitterNode>) => {
+export const SplitterNode = ({ selected, data: { node, id } }: NodeProps<SplitterNode>) => {
     const graph = useStore(state => state.graph);
+
+    // See the same check in Recipe node.
+    if (!graph.hasNode(id)) {
+        return null;
+    }
+
     return <CombinerNode selected={selected ?? false} kind="splitter">
         {[
             [SPLITTER_INPUTS, "target"] as const,
@@ -23,7 +30,7 @@ export const SplitterNode = ({ selected, id }: NodeProps<SplitterNode>) => {
                     type={type}
                     css={handleCss}
                     position={splitterHandlePos(h)}
-                    isConnectable={!graph.node(fromFlowNodeId(id)).isHandleConnected(h)}
+                    isConnectable={!node.isHandleConnected(h)}
 
                 />
             ))

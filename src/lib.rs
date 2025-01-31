@@ -1,4 +1,5 @@
 use base64::Engine;
+use deflate::Compression;
 
 use wasm_bindgen::prelude::*;
 
@@ -28,7 +29,8 @@ pub fn compress_state(json: &str) -> String {
     let orig_graph = input.state.graph;
     let compressed_graph = compressed::Graph::from(orig_graph);
     let encoded = bitcode::encode(&compressed_graph);
-    let base64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&encoded);
+    let compressed = deflate::deflate_bytes_conf(&encoded, Compression::Best);
+    let base64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&compressed);
 
     base64
 }

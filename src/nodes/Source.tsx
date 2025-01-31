@@ -19,6 +19,7 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
         setData: store.setSourceNodeData,
         graph: store.graph,
     })));
+    const rateInput = useRef<HTMLInputElement>(null);
 
     // See the same check in Recipe node.
     if (!graph.hasNode(id)) {
@@ -28,7 +29,6 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
     const updateData = (update: Partial<SourceGraphNode>) => setData(id, update);
     const hasConnection = node.outgoingEdges.size > 0;
     const expectedRate = graph.expectedOutputRate(new GraphHandle(id, node.outputs()[0]));
-    const rateInput = useRef<HTMLInputElement>(null);
 
     return <div css={{ width: 25, height: 25, position: "relative" }}>
         <div css={{

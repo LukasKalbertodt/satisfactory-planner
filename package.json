@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "wasm-pack build --no-default-features --release && tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -33,6 +33,7 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "vite-plugin-wasm": "^3.4.1"
   }
 }

@@ -38,7 +38,7 @@ impl Node {
                 pos: Pos::from(pos),
                 recipe: recipe as u16,
                 buildings_count,
-                overclock,
+                overclock: Overclock::from(overclock),
             },
             original::Node::Merger { pos } => Node::Merger {
                 pos: Pos::from(pos),
@@ -80,7 +80,7 @@ pub enum Node {
         pos: Pos,
         recipe: u16,
         buildings_count: NonZeroU16,
-        overclock: f32,
+        overclock: Overclock,
     },
     Merger {
         pos: Pos,
@@ -93,6 +93,29 @@ pub enum Node {
         item: u8,
         rate: u32,
     },
+}
+
+#[derive(Encode, Decode)]
+pub enum Overclock {
+    Pe50,
+    Pe100,
+    Pe150,
+    Pe200,
+    Pe250,
+    Custom(f32),
+}
+
+impl Overclock {
+    fn from(orig: f32) -> Self {
+        match orig {
+            0.5 => Self::Pe50,
+            1.0 => Self::Pe100,
+            1.5 => Self::Pe150,
+            2.0 => Self::Pe200,
+            2.5 => Self::Pe250,
+            _ => Self::Custom(orig),
+        }
+    }
 }
 
 #[derive(Encode, Decode)]

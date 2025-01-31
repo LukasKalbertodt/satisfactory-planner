@@ -23,7 +23,6 @@ import {
 import { EDGE_TYPES, MainEdge } from './edges';
 import { Header } from './Header';
 import { GraphHandle } from './graph';
-import { greet } from "../pkg/satisfactory_planner";
 import { useImmer } from 'use-immer';
 
 
@@ -31,7 +30,6 @@ import { useImmer } from 'use-immer';
 
 export default function App() {
     const ref = useRef<HTMLDivElement>(null);
-    console.log(greet("Vite"));
 
     const {
         graph, removeNode, addEdge, removeEdge, updateNodePos,

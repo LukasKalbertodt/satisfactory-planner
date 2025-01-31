@@ -9,6 +9,7 @@ import { bug } from "./util";
 import { SourceGraphNode } from "./graph/source";
 import { RecipeGraphNode } from "./graph/recipe";
 import { persist, PersistStorage } from "zustand/middleware";
+import { compress_state } from "../pkg/satisfactory_planner";
 
 
 export type State = {
@@ -75,6 +76,7 @@ const storage: PersistStorage<State & Actions> = {
         if (!str) {
             return null;
         }
+        console.log("Compressed: ", compress_state(str));
         const json = JSON.parse(str);
         const { state } = json;
         return {
@@ -86,7 +88,9 @@ const storage: PersistStorage<State & Actions> = {
         };
     },
     setItem: (name, value) => {
-        localStorage.setItem(name, JSON.stringify(value));
+        const json = JSON.stringify(value);
+        localStorage.setItem(name, json);
+        console.log("Compressed: ", compress_state(json));
     },
     removeItem: name => {
         localStorage.removeItem(name);

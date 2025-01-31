@@ -1,9 +1,12 @@
+use base64::Engine;
+
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
-pub fn greet(name: &str) -> String {
-    format!("Hello from Rust, {}!", name)
-}
+
+#[path ="gamedata/data.rs"]
+mod gamedata;
+mod original;
+mod compressed;
 
 
 #[wasm_bindgen]
@@ -16,4 +19,16 @@ pub fn set_panic_hook() {
     // https://github.com/rustwasm/console_error_panic_hook#readme
     #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
+}
+
+
+#[wasm_bindgen]
+pub fn compress_state(json: &str) -> String {
+    let input = serde_json::from_str::<original::Input>(json).expect("Failed to deserialize");
+    let orig_graph = input.state.graph;
+    let compressed_graph = compressed::Graph::from(orig_graph);
+    let encoded = bitcode::encode(&compressed_graph);
+    let base64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&encoded);
+
+    base64
 }

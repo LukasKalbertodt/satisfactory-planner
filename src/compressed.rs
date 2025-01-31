@@ -34,22 +34,28 @@ impl Graph {
 impl Node {
     fn from(orig: original::Node) -> Self {
         match orig {
-            original::Node::Recipe { pos, recipe, buildings_count, overclock } => Node::Recipe {
+            original::Node::Recipe { pos, recipe, buildings_count, overclock } => Node {
                 pos: Pos::from(pos),
-                recipe: recipe as u16,
-                buildings_count,
-                overclock: Overclock::from(overclock),
+                data: NodeData::Recipe {
+                    recipe: recipe as u16,
+                    buildings_count,
+                    overclock: Overclock::from(overclock),
+                },
             },
-            original::Node::Merger { pos } => Node::Merger {
+            original::Node::Merger { pos } => Node {
                 pos: Pos::from(pos),
+                data: NodeData::Merger {}
             },
-            original::Node::Splitter { pos } => Node::Splitter {
+            original::Node::Splitter { pos } => Node {
                 pos: Pos::from(pos),
+                data: NodeData::Splitter {}
             },
-            original::Node::Source { pos, item, rate } => Node::Source {
+            original::Node::Source { pos, item, rate } => Node {
                 pos: Pos::from(pos),
-                item: item as u8,
-                rate,
+                data: NodeData::Source {
+                    item: item as u8,
+                    rate,
+                },
             },
         }
     }
@@ -73,23 +79,22 @@ pub struct GraphHandle {
     pub node: NodeId,
     pub handle: HandleId,
 }
+#[derive(Encode, Decode)]
+pub struct Node {
+    pos: Pos,
+    data: NodeData,
+}
 
 #[derive(Encode, Decode)]
-pub enum Node {
+pub enum NodeData {
     Recipe {
-        pos: Pos,
         recipe: u16,
         buildings_count: NonZeroU16,
         overclock: Overclock,
     },
-    Merger {
-        pos: Pos,
-    },
-    Splitter {
-        pos: Pos,
-    },
+    Merger { },
+    Splitter { },
     Source {
-        pos: Pos,
         item: u8,
         rate: u32,
     },

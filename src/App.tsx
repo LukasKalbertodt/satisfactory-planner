@@ -13,7 +13,7 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { FlowNode, NODE_TYPES } from './nodes';
-import { calcNewNodeMenuPos, NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
+import { NewNodeMenu, NewNodeMenuPos } from './NewNodeMenu';
 import { useStore } from './store';
 import { useShallow } from 'zustand/shallow';
 import {
@@ -24,6 +24,7 @@ import { EDGE_TYPES, MainEdge } from './edges';
 import { Header } from './Header';
 import { GraphHandle } from './graph';
 import { useImmer } from 'use-immer';
+import { calcNewNodeMenuPos } from './new-node-menu';
 
 
 

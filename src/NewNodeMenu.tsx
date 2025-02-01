@@ -13,6 +13,7 @@ import { RecipeGraphNode } from "./graph/recipe";
 import { SplitterGraphNode } from "./graph/splitter";
 import { MergerGraphNode } from "./graph/merger";
 import { SourceGraphNode } from "./graph/source";
+import { NEW_NODE_MENU_HEIGHT, NEW_NODE_MENU_WIDTH } from "./new-node-menu";
 
 
 export type NewNodeMenuPos = {
@@ -28,30 +29,7 @@ export type NewNodeMenuPos = {
     };
 };
 
-const WIDTH = 250;
-const HEIGHT = 320;
 
-export const calcNewNodeMenuPos = (
-    e: React.MouseEvent | MouseEvent,
-    bounds: DOMRect,
-): NewNodeMenuPos => {
-    // Set just one property per dimension. The menu defaults to opening to the right bottom of
-    // the mouse, but if that would it to overflow, we position it differently.
-    return ({
-        css: {
-            ...(e.clientY < bounds.height - HEIGHT || e.clientY < HEIGHT)
-                ? { top: e.clientY }
-                : { bottom: bounds.bottom - e.clientY },
-            ...e.clientX < bounds.width - WIDTH
-                ? { left: e.clientX }
-                : { right: bounds.right - e.clientX },
-        },
-        mouse: {
-            x: e.clientX,
-            y: e.clientY,
-        },
-    });
-};
 
 export type NewNodeMenuProps = {
     pos: NewNodeMenuPos;
@@ -98,8 +76,8 @@ export const NewNodeMenu = ({ pos, close }: NewNodeMenuProps) => {
         <div css={{
             position: "absolute",
             ...pos.css,
-            width: WIDTH,
-            height: HEIGHT,
+            width: NEW_NODE_MENU_WIDTH,
+            height: NEW_NODE_MENU_HEIGHT,
             zIndex: 100,
 
             display: "flex",

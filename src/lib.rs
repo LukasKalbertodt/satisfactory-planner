@@ -11,6 +11,18 @@ mod compressed;
 
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
+#[macro_export]
+macro_rules! log {
+    ($($t:tt)*) => ($crate::log(&format!($($t)*)));
+}
+
+
+#[wasm_bindgen]
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
     // `set_panic_hook` function at least once during initialization, and then
@@ -32,5 +44,6 @@ pub fn compress_state(json: &str) -> String {
     let compressed = deflate::deflate_bytes_conf(&encoded, Compression::Best);
     let base64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&compressed);
 
+    log!("{: >4} ({: >4} compressed)", encoded.len(), compressed.len());
     base64
 }

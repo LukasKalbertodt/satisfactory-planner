@@ -29,9 +29,8 @@ pub fn compress_state(json: &str) -> String {
     set_panic_hook();
 
     let input = serde_json::from_str::<state::Input>(json).expect("Failed to deserialize");
-    let graph = input.state.graph;
-    let digest_graph = digest::Graph::from_state(graph);
-    let encoded = bitcode::encode(&digest_graph);
+    let digest_state = digest::State::from_state(input);
+    let encoded = bitcode::encode(&digest_state);
     let compressed = deflate::deflate_bytes_conf(&encoded, Compression::Best);
     let base64 = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&encoded);
 
@@ -45,12 +44,8 @@ pub fn decompress_state(digest: &str) -> String {
 
     let binary = base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(&digest)
         .expect("invalid base64");
-    let digest_graph = bitcode::decode::<digest::Graph>(&binary).expect("failed to decode");
-    let graph = digest_graph.into_state();
-    let state = state::Input {
-        state: state::State { graph },
-        version: 0, // TODO
-    };
+    let digest_state = bitcode::decode::<digest::State>(&binary).expect("failed to decode");
+    let state = digest_state.into_state();
     let json = serde_json::to_string(&state).expect("Failed to serialize");
 
     json

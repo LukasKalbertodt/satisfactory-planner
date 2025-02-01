@@ -124,7 +124,7 @@ const storage: PersistStorage<State & Actions> = {
         }
         const json = JSON.parse(str);
         const digest = compress_state(str);
-        console.log("Compressed: ", digest);
+        console.log("Digest: ", digest);
         const roundtrip = decompress_state(digest);
         const rtstate = JSON.parse(roundtrip);
 

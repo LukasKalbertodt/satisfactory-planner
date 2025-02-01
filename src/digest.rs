@@ -5,6 +5,24 @@ use bitcode::{Decode, Encode};
 use crate::{gamedata::{ItemKind, RecipeKind}, state::{self, HandleId, NodeId}};
 
 
+impl State {
+    pub fn from_state(orig: state::Input) -> Self {
+        Self {
+            version: orig.version as u8, // TODO
+            graph: Graph::from_state(orig.state.graph),
+        }
+    }
+
+    pub fn into_state(self) -> state::Input {
+        state::Input {
+            version: self.version.into(),
+            state: state::State {
+                graph: self.graph.into_state(),
+            },
+        }
+    }
+}
+
 impl Graph {
     pub fn from_state(orig: state::Graph) -> Self {
         // Remap IDs: this is the only operation that destroys the JSON roundtrip: we don't care
@@ -109,6 +127,11 @@ impl Edge {
     }
 }
 
+#[derive(Encode, Decode)]
+pub struct State {
+    pub version: u8,
+    pub graph: Graph,
+}
 
 #[derive(Encode, Decode)]
 pub struct Graph {

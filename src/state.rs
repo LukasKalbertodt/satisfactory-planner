@@ -1,23 +1,23 @@
 use std::{collections::BTreeMap, num::NonZeroU16};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::gamedata::{ItemKind, RecipeKind};
 
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Input {
     pub state: State,
     #[allow(dead_code)]
     pub version: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct State {
     pub graph: Graph,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Graph {
     pub nodes: BTreeMap<NodeId, Node>,
     pub edges: Vec<Edge>,
@@ -26,19 +26,19 @@ pub struct Graph {
 pub type NodeId = u16;
 pub type HandleId = u8;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Edge {
     pub source: GraphHandle,
     pub target: GraphHandle,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct GraphHandle {
     pub node: NodeId,
     pub handle: HandleId,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum Node {
     #[serde(rename_all = "camelCase")]
@@ -61,7 +61,7 @@ pub enum Node {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 pub struct Pos {
     pub x: i32,
     pub y: i32,

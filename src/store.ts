@@ -9,7 +9,8 @@ import { bug } from "./util";
 import { SourceGraphNode } from "./graph/source";
 import { RecipeGraphNode } from "./graph/recipe";
 import { persist, PersistStorage } from "zustand/middleware";
-import { compress_state } from "../pkg/satisfactory_planner";
+import { compress_state, decompress_state } from "../pkg/satisfactory_planner";
+import equal from "fast-deep-equal";
 
 
 export type State = {
@@ -69,6 +70,51 @@ const stateInit = immer<State & Actions>(set => ({
 }));
 
 
+
+/**
+ * Checks if two states are the same, ignoring order of edges/nodes and node IDs.
+ *
+ * This is wrong in a few special case (e.g. nodes of the same type at the same position), but it's
+ * only for testing.
+ */
+const isStateEqual = (a: any, b: any) => {
+    if (a.graph.nodes.size !== b.graph.nodes.size || a.graph.edges.size !== b.graph.edges.size) {
+        return false;
+    }
+
+    const aNodeIdToB = new Map();
+    for (const [idA, valueA] of Object.entries(a.graph.nodes)) {
+        const res = Object.entries(b.graph.nodes).find(([idB, valueB]) => (
+            equal(valueB.pos, valueA.pos) && valueB.type === valueA.type
+        ));
+
+        if (res == null) {
+            console.error("Node not found in b", idA);
+            return false;
+        }
+
+        const [idB, ] = res;
+        aNodeIdToB.set(Number(idA), Number(idB));
+    }
+
+    for (const edgeA of a.graph.edges) {
+        const res = b.graph.edges.find(edgeB => (
+            aNodeIdToB.get(edgeA.source.node) === edgeB.source.node
+            && edgeA.source.handle === edgeB.source.handle
+            && aNodeIdToB.get(edgeA.target.node) === edgeB.target.node
+            && edgeA.target.handle === edgeB.target.handle
+        ));
+
+        if (res == null) {
+            console.error("Edge not found in b", edgeA, b.graph.edges, aNodeIdToB);
+            return false;
+        }
+    }
+
+    return true;
+};
+
+
 // Custom storage engine to do custom serialization/deserialization.
 const storage: PersistStorage<State & Actions> = {
     getItem: name => {
@@ -76,8 +122,21 @@ const storage: PersistStorage<State & Actions> = {
         if (!str) {
             return null;
         }
-        console.log("Compressed: ", compress_state(str));
         const json = JSON.parse(str);
+        const digest = compress_state(str);
+        console.log("Compressed: ", digest);
+        const roundtrip = decompress_state(digest);
+        const rtstate = JSON.parse(roundtrip);
+
+        // Check roundtrip
+        if (rtstate.version !== json.version) {
+            console.error("Roundtrip failed: version mismatch");
+        } else if (!isStateEqual(rtstate.state, json.state)) {
+            console.error("Roundtrip failed: state not equal");
+        } else {
+            console.log("roundtrip good");
+        }
+
         const { state } = json;
         return {
             ...json,

@@ -134,6 +134,7 @@ const main = async () => {
     await Deno.writeTextFile("../src/gamedata/recipes.ts", recipesDef);
 
     console.log("Generating output Rust files...");
+    const toPascalCase = (str: string) => str.replace(/(?:^|-)([a-z0-9])/g, (_, c) => c.toUpperCase());
     let rustCode = fileHeader;
     rustCode += "#[derive(serde::Deserialize, serde::Serialize)]\n";
     rustCode += "#[repr(u16)]\n";
@@ -141,17 +142,38 @@ const main = async () => {
     for (const [i, [key, recipe]] of Object.entries(recipes).map((e, i) => [i, e] as const)) {
         const pascalCaseId = recipe.id.replace(/(?:^|-)([a-z0-9])/g, (_, c) => c.toUpperCase());
         rustCode += `    #[serde(rename = "${recipe.id}")]\n`;
-        rustCode += `    ${pascalCaseId} = ${i},\n`;
+        rustCode += `    ${toPascalCase(recipe.id)} = ${i},\n`;
     }
+    rustCode += "}\n\n";
+    rustCode += "impl TryFrom<u16> for RecipeKind {\n";
+    rustCode += "    type Error = ();\n";
+    rustCode += "    fn try_from(value: u16) -> Result<Self, Self::Error> {\n";
+    rustCode += "        match value {\n";
+    for (const [i, [key, recipe]] of Object.entries(recipes).map((e, i) => [i, e] as const)) {
+        rustCode += `            ${i} => Ok(RecipeKind::${toPascalCase(recipe.id)}),\n`;
+    }
+    rustCode += "            _ => Err(()),\n";
+    rustCode += "        }\n";
+    rustCode += "    }\n";
     rustCode += "}\n\n";
     rustCode += "#[derive(serde::Deserialize, serde::Serialize)]\n";
     rustCode += "#[repr(u8)]\n";
     rustCode += "pub enum ItemKind {\n";
     for (const [i, [key, item]] of Object.entries(items).map((e, i) => [i, e] as const)) {
-        const pascalCaseId = item.id.replace(/(?:^|-)([a-z0-9])/g, (_, c) => c.toUpperCase());
         rustCode += `    #[serde(rename = "${item.id}")]\n`;
-        rustCode += `    ${pascalCaseId} = ${i},\n`;
+        rustCode += `    ${toPascalCase(item.id)} = ${i},\n`;
     }
+    rustCode += "}\n\n";
+    rustCode += "impl TryFrom<u8> for ItemKind {\n";
+    rustCode += "    type Error = ();\n";
+    rustCode += "    fn try_from(value: u8) -> Result<Self, Self::Error> {\n";
+    rustCode += "        match value {\n";
+    for (const [i, [key, item]] of Object.entries(items).map((e, i) => [i, e] as const)) {
+        rustCode += `            ${i} => Ok(ItemKind::${toPascalCase(item.id)}),\n`;
+    }
+    rustCode += "            _ => Err(()),\n";
+    rustCode += "        }\n";
+    rustCode += "    }\n";
     rustCode += "}\n\n";
     await Deno.writeTextFile("../src/gamedata/data.rs", rustCode);
 };

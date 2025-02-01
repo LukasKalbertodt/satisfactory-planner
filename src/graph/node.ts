@@ -55,5 +55,5 @@ export abstract class GraphNode {
         }, unreachable);
     }
 
-    abstract toJSON(): GraphJson["nodes"][string];
+    abstract toJSON(): GraphJson["nodes"][number];
 }

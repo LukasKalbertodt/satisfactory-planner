@@ -1,4 +1,4 @@
-use std::{collections::HashMap, num::NonZeroU16};
+use std::num::NonZeroU16;
 
 use bitcode::{Decode, Encode};
 
@@ -25,22 +25,15 @@ impl State {
 
 impl Graph {
     pub fn from_state(orig: state::Graph) -> Self {
-        // Remap IDs: this is the only operation that destroys the JSON roundtrip: we don't care
-        // about keeping the original IDs as they are not user-visible.
-        let orig_id_to_idx: HashMap<NodeId, usize> = orig.nodes.keys().enumerate().map(|(idx, &id)| (id, idx)).collect();
-
         Self {
-            nodes: orig.nodes.into_values().map(Node::from_state).collect(),
-            edges: orig.edges.into_iter().map(|e| Edge::from_state(e, &&orig_id_to_idx)).collect(),
+            nodes: orig.nodes.into_iter().map(Node::from_state).collect(),
+            edges: orig.edges.into_iter().map(|e| Edge::from_state(e)).collect(),
         }
     }
 
     pub fn into_state(self) -> state::Graph {
         state::Graph {
-            nodes: self.nodes.into_iter()
-                .enumerate().
-                map(|(idx, n)| (idx as NodeId, n.into_state()))
-                .collect(),
+            nodes: self.nodes.into_iter().map(Node::into_state).collect(),
             edges: self.edges.into_iter().map(Edge::into_state).collect(),
         }
     }
@@ -99,15 +92,15 @@ impl Node {
 }
 
 impl Edge {
-    fn from_state(orig: state::Edge, orig_id_to_idx: &HashMap<NodeId, usize>) -> Self {
+    fn from_state(orig: state::Edge) -> Self {
         Self {
             source: GraphHandle {
-                node: orig_id_to_idx[&orig.source.node] as u16,
+                node: orig.source.node,
                 // handle: if orig.source.handle >= 4 { orig.source.handle - 4 } else { orig.source.handle },
                 handle: orig.source.handle,
             },
             target: GraphHandle {
-                node: orig_id_to_idx[&orig.target.node] as u16,
+                node: orig.target.node,
                 handle: orig.target.handle,
             },
         }

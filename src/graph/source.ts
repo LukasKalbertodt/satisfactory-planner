@@ -26,7 +26,7 @@ export class SourceGraphNode extends GraphNode {
         return [0 as GraphHandleId];
     }
 
-    toJSON(): GraphJson["nodes"][string] {
+    toJSON(): GraphJson["nodes"][number] {
         const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;
         return {
             type: this.type(),

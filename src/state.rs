@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, num::NonZeroU16};
+use std::num::NonZeroU16;
 
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,7 @@ pub struct State {
 
 #[derive(Deserialize, Serialize)]
 pub struct Graph {
-    pub nodes: BTreeMap<NodeId, Node>,
+    pub nodes: Vec<Node>,
     pub edges: Vec<Edge>,
 }
 

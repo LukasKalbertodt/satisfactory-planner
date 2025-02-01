@@ -218,16 +218,22 @@ export class Graph {
     }
 
     toJSON(): GraphJson {
+        const idIndexMap = new Map<GraphNodeId, number>();
         const out: GraphJson = {
-            nodes: {},
+            nodes: [],
             edges: [],
         };
         for (const [id, node] of this.nodes) {
-            out.nodes[id.toString()] = node.toJSON();
+            const idx = out.nodes.length;
+            out.nodes.push(node.toJSON());
+            idIndexMap.set(id, idx);
+        }
+
+        for (const [id, node] of this.nodes) {
             for (const [handle, target] of node.outgoingEdges) {
                 out.edges.push({
-                    source: { node: id, handle },
-                    target,
+                    source: { node: notNullish(idIndexMap.get(id)), handle },
+                    target: { node: notNullish(idIndexMap.get(target.node)), handle: target.handle },
                 });
             }
         }
@@ -243,15 +249,11 @@ export class Graph {
         }
 
         const out = new Graph();
-        for (const [rawId, jsonNode] of Object.entries(data.nodes)) {
-            const id = parseInt(rawId) as GraphNodeId;
-            if (isNaN(id)) {
-                throw new Error("invalid node id");
-            }
-            out.nodeIdCounter = Math.max(out.nodeIdCounter, id);
+        for (const [idx, jsonNode] of data.nodes.map((node, idx) => [idx, node] as const)) {
+            const id = idx as GraphNodeId;
 
             const pos = jsonNode.pos;
-            out.nodes.set(id as GraphNodeId, matchTag(jsonNode, "type", {
+            out.nodes.set(id, matchTag(jsonNode, "type", {
                 "recipe": jsonNode => {
                     const n = new RecipeGraphNode(jsonNode.recipe, pos);
                     n.buildingsCount = jsonNode.buildingsCount;
@@ -264,7 +266,7 @@ export class Graph {
             }));
         }
 
-        out.nodeIdCounter += 1;
+        out.nodeIdCounter = data.nodes.length;
 
         for (const edge of data.edges) {
             out.addEdge(
@@ -292,7 +294,7 @@ const graphSchema = {
     },
     properties: {
         nodes: {
-            values: {
+            elements: {
                 discriminator: "type",
                 mapping: {
                     "recipe": {

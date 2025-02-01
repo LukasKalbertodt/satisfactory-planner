@@ -29,7 +29,7 @@ export class SplitterGraphNode extends GraphNode {
         return SPLITTER_OUTPUTS;
     }
 
-    toJSON(): GraphJson["nodes"][string] {
+    toJSON(): GraphJson["nodes"][number] {
         const { incomingEdges: _0, outgoingEdges: _1, ...rest } = this;
         return {
             type: this.type(),

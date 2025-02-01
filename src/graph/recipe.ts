@@ -77,7 +77,7 @@ export class RecipeGraphNode extends GraphNode {
         };
     }
 
-    toJSON(): GraphJson["nodes"][string] {
+    toJSON(): GraphJson["nodes"][number] {
         const { incomingEdges: _0, outgoingEdges: _1, recipeId: _2, ...rest } = this;
         return {
             type: this.type(),

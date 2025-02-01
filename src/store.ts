@@ -3,7 +3,7 @@ import { immer } from "zustand/middleware/immer";
 import { XYPosition } from "@xyflow/react";
 import { temporal } from 'zundo';
 
-import { Graph, GraphHandle, GraphNodeId } from "./graph";
+import { Graph, GraphHandle, GraphJson, GraphNodeId } from "./graph";
 import { GraphNode } from "./graph/node";
 import { bug } from "./util";
 import { SourceGraphNode } from "./graph/source";
@@ -70,6 +70,12 @@ const stateInit = immer<State & Actions>(set => ({
 }));
 
 
+type PersistedState = {
+    version: number;
+    state: {
+        graph: GraphJson;
+    };
+};
 
 /**
  * Checks if two states are the same, ignoring order of edges/nodes and node IDs.
@@ -77,16 +83,21 @@ const stateInit = immer<State & Actions>(set => ({
  * This is wrong in a few special case (e.g. nodes of the same type at the same position), but it's
  * only for testing.
  */
-const isStateEqual = (a: any, b: any) => {
-    if (a.graph.nodes.size !== b.graph.nodes.size || a.graph.edges.size !== b.graph.edges.size) {
+const isStateEqual = (a: PersistedState, b: PersistedState) => {
+    if (a.version !== b.version) {
+        console.error("Version mismatch", a.version, b.version);
+        return false;
+    }
+
+    const ga = a.state.graph;
+    const gb = b.state.graph;
+    if (ga.nodes.length !== gb.nodes.length || ga.edges.length !== gb.edges.length) {
         return false;
     }
 
     const aNodeIdToB = new Map();
-    for (const [idA, valueA] of Object.entries(a.graph.nodes)) {
-        const res = Object.entries(b.graph.nodes).find(([idB, valueB]) => (
-            equal(valueB.pos, valueA.pos) && valueB.type === valueA.type
-        ));
+    for (const [idA, valueA] of Object.entries(ga.nodes)) {
+        const res = Object.entries(gb.nodes).find(([_, valueB]) => equal(valueA, valueB));
 
         if (res == null) {
             console.error("Node not found in b", idA);
@@ -97,8 +108,8 @@ const isStateEqual = (a: any, b: any) => {
         aNodeIdToB.set(Number(idA), Number(idB));
     }
 
-    for (const edgeA of a.graph.edges) {
-        const res = b.graph.edges.find(edgeB => (
+    for (const edgeA of ga.edges) {
+        const res = gb.edges.find(edgeB => (
             aNodeIdToB.get(edgeA.source.node) === edgeB.source.node
             && edgeA.source.handle === edgeB.source.handle
             && aNodeIdToB.get(edgeA.target.node) === edgeB.target.node
@@ -106,7 +117,7 @@ const isStateEqual = (a: any, b: any) => {
         ));
 
         if (res == null) {
-            console.error("Edge not found in b", edgeA, b.graph.edges, aNodeIdToB);
+            console.error("Edge not found in b", edgeA, gb.edges, aNodeIdToB);
             return false;
         }
     }
@@ -129,9 +140,7 @@ const storage: PersistStorage<State & Actions> = {
         const rtstate = JSON.parse(roundtrip);
 
         // Check roundtrip
-        if (rtstate.version !== json.version) {
-            console.error("Roundtrip failed: version mismatch");
-        } else if (!isStateEqual(rtstate.state, json.state)) {
+        if (!isStateEqual(rtstate, json)) {
             console.error("Roundtrip failed: state not equal");
         } else {
             console.log("roundtrip good");

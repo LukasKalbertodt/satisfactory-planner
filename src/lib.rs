@@ -22,21 +22,12 @@ macro_rules! log {
 }
 
 
-#[wasm_bindgen]
-pub fn set_panic_hook() {
-    // When the `console_error_panic_hook` feature is enabled, we can call the
-    // `set_panic_hook` function at least once during initialization, and then
-    // we will get better error messages if our code ever panics.
-    //
-    // For more details see
-    // https://github.com/rustwasm/console_error_panic_hook#readme
-    #[cfg(feature = "console_error_panic_hook")]
-    console_error_panic_hook::set_once();
-}
 
 
 #[wasm_bindgen]
 pub fn compress_state(json: &str) -> String {
+    set_panic_hook();
+
     let input = serde_json::from_str::<state::Input>(json).expect("Failed to deserialize");
     let graph = input.state.graph;
     let digest_graph = digest::Graph::from_state(graph);
@@ -50,10 +41,10 @@ pub fn compress_state(json: &str) -> String {
 
 #[wasm_bindgen]
 pub fn decompress_state(digest: &str) -> String {
-    let compressed = base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(&digest)
+    set_panic_hook();
+
+    let binary = base64::engine::general_purpose::URL_SAFE_NO_PAD.decode(&digest)
         .expect("invalid base64");
-    // let binary = todo!();
-    let binary = compressed;
     let digest_graph = bitcode::decode::<digest::Graph>(&binary).expect("failed to decode");
     let graph = digest_graph.into_state();
     let state = state::Input {
@@ -63,4 +54,9 @@ pub fn decompress_state(digest: &str) -> String {
     let json = serde_json::to_string(&state).expect("Failed to serialize");
 
     json
+}
+
+fn set_panic_hook() {
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
 }

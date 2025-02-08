@@ -92,12 +92,30 @@ const isStateEqual = (a: PersistedState, b: PersistedState) => {
     const ga = a.state.graph;
     const gb = b.state.graph;
     if (ga.nodes.length !== gb.nodes.length || ga.edges.length !== gb.edges.length) {
+        console.error("length mismatch", {
+            nodeCountA: ga.nodes.length,
+            nodeCountB: gb.nodes.length,
+            edgeCountA: ga.edges.length,
+            edgeCountB: gb.edges.length,
+        });
         return false;
     }
 
+    const minX = Math.min(...a.state.graph.nodes.map(n => n.pos.x));
+    const minY = Math.min(...a.state.graph.nodes.map(n => n.pos.y));
+
+
     const aNodeIdToB = new Map();
     for (const [idA, valueA] of Object.entries(ga.nodes)) {
-        const res = Object.entries(gb.nodes).find(([_, valueB]) => equal(valueA, valueB));
+        const res = Object.entries(gb.nodes).find(([_, valueB]) => {
+            const { pos: posA, ...restA } = valueA;
+            const { pos: posB, ...restB } = valueB;
+            const correctedPosB = {
+                x: posB.x + minX,
+                y: posB.y + minY,
+            };
+            return equal(posA, correctedPosB) && equal(restA, restB);
+        });
 
         if (res == null) {
             console.error("Node not found in b", idA);
@@ -140,7 +158,7 @@ const storage: PersistStorage<State & Actions> = {
         const rtstate = JSON.parse(roundtrip);
 
         // Check roundtrip
-        if (!isStateEqual(rtstate, json)) {
+        if (!isStateEqual(json, rtstate)) {
             console.error("Roundtrip failed: state not equal");
         } else {
             console.log("roundtrip good");

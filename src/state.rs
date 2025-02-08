@@ -1,8 +1,8 @@
-use std::num::NonZeroU16;
+use std::num::NonZeroU32;
 
 use serde::{Deserialize, Serialize};
 
-use crate::gamedata::{ItemKind, RecipeKind};
+use crate::gamedata::{RecipeKind, SourceItemKind};
 
 
 #[derive(Deserialize, Serialize)]
@@ -38,14 +38,14 @@ pub struct GraphHandle {
     pub handle: HandleId,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum Node {
     #[serde(rename_all = "camelCase")]
     Recipe {
         pos: Pos,
         recipe: RecipeKind,
-        buildings_count: NonZeroU16,
+        buildings_count: NonZeroU32,
         overclock: f32,
     },
     Merger {
@@ -56,12 +56,23 @@ pub enum Node {
     },
     Source {
         pos: Pos,
-        item: ItemKind,
+        item: SourceItemKind,
         rate: u32,
     },
 }
 
-#[derive(Deserialize, Serialize)]
+impl Node {
+    pub fn pos(&self) -> &Pos {
+        match self {
+            Node::Recipe { pos, .. } => pos,
+            Node::Merger { pos, .. } => pos,
+            Node::Splitter { pos, .. } => pos,
+            Node::Source { pos, .. } => pos,
+        }
+    }
+}
+
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct Pos {
     pub x: i32,
     pub y: i32,

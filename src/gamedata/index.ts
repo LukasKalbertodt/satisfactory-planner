@@ -1,8 +1,9 @@
-import { ITEMS as ITEMS_ } from "./items";
+import { ITEMS as ITEMS_, RESOURCE_ITEMS as RESOURCE_ITEMS_ } from "./items";
 import { RECIPES as RECIPES_ } from "./recipes";
 
 export const ITEMS: Record<ItemId, Item> = ITEMS_;
 export const RECIPES: Record<RecipeId, Recipe> = RECIPES_;
+export const RESOURCE_ITEMS = RESOURCE_ITEMS_ satisfies readonly ItemId[];
 
 export type ItemId = keyof typeof ITEMS_;
 export type Item = {
@@ -60,20 +61,5 @@ type ProductionBuilding =
     | "converter"
     | "quantum-encoder"
     ;
-
-export const RESOURCE_ITEMS = [
-    "iron-ore",
-    "copper-ore",
-    "limestone",
-    "coal",
-    "water",
-    "raw-quartz",
-    "sulfur",
-    "crude-oil",
-    "caterium-ore",
-    "bauxite",
-    "uranium",
-    "sam",
-] as const satisfies ItemId[];
 
 export type ResourceItem = typeof RESOURCE_ITEMS[number];

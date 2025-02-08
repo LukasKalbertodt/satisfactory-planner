@@ -3,6 +3,7 @@
 // The data in this file is not licensed under the same license as the rest of the
 // project. It is derived from the Satisfactory Wiki, which in turn took it from the
 // game. See the main README for more information.
+
 import type { Recipe } from ".";
 
 export const RECIPES = {

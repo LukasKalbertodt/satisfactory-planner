@@ -3,7 +3,23 @@
 // The data in this file is not licensed under the same license as the rest of the
 // project. It is derived from the Satisfactory Wiki, which in turn took it from the
 // game. See the main README for more information.
+
 import type { Item } from ".";
+
+export const RESOURCE_ITEMS = [
+    "iron-ore",
+    "copper-ore",
+    "limestone",
+    "coal",
+    "water",
+    "raw-quartz",
+    "sulfur",
+    "crude-oil",
+    "caterium-ore",
+    "bauxite",
+    "uranium",
+    "sam",
+] as const;
 
 export const ITEMS = {
     "uranium-waste": { // Desc_NuclearWaste_C

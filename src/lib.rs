@@ -4,7 +4,6 @@ use deflate::Compression;
 use wasm_bindgen::prelude::*;
 
 
-#[path ="gamedata/data.rs"]
 mod gamedata;
 mod state;
 mod digest;

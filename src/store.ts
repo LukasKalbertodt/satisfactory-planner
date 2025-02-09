@@ -175,8 +175,17 @@ const storage: PersistStorage<State & Actions> = {
     },
     setItem: (name, value) => {
         const json = JSON.stringify(value);
+        const digest = compress_state(json);
         localStorage.setItem(name, json);
-        console.log("Compressed: ", compress_state(json));
+
+        const url = new URL(window.location.href);
+        const alreadyOnPlan = url.searchParams.has("d");
+        url.searchParams.set("d", digest);
+        if (alreadyOnPlan) {
+            window.history.replaceState(null, "", url);
+        } else {
+            window.history.pushState(null, "", url);
+        };
     },
     removeItem: name => {
         localStorage.removeItem(name);

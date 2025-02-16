@@ -254,18 +254,19 @@ fn write_building_count(buf: &mut BitBuf, v: NonZero<u32>) {
         // 11 = 0b1011, this case never sets the first two bits to 1.
         1..=12 => buf.write_bits(v - 1, 4),
 
-        // Otherwise, we use a 9 bit number. I never had a plan with more than that number of
-        // buildings. Since we already covered 1-12, these 9 bits can cover 13-(2^9 + 12) = 13-524.
-        13..=524 => {
+        // Otherwise, we use a 6 bit number. Since we already covered 1-12, these 6 bits can cover
+        // 13 -- (2^6 + 12) = 13 -- 76. Only very rarely did I see numbers higher than that.
+        13..=76 => {
             buf.write_bits(0b110, 3);
-            buf.write_bits(v - 13, 9);
+            buf.write_bits(v - 13, 6);
         }
 
-        // But just to make sure to be able to work with crazy plans, we have a 24bit backup.
-        525.. => {
+        // As a last resort, we use 12 bits, which allows numbers up to 4172.
+        77..=4172 => {
             buf.write_bits(0b111, 3);
-            buf.write_bits(v - 525, 24);
+            buf.write_bits(v - 77, 12);
         }
+        _ => panic!("building count too high ({v})"),
     }
 }
 
@@ -278,13 +279,13 @@ fn read_building_count(buf: &mut BitReader) -> NonZero<u32> {
         return nz((first_two << 2 | buf.read_bits(2)) + 1);
     }
 
-    // 9 Bit number
+    // 6 Bit number
     if buf.read_bits(1) == 0 {
-        return nz(buf.read_bits(9) + 13);
+        return nz(buf.read_bits(6) + 13);
     }
 
-    // 24 Bit number
-    nz(buf.read_bits(24) + 525)
+    // 12 Bit number
+    nz(buf.read_bits(12) + 77)
 }
 
 fn write_source_item_kind(buf: &mut BitBuf, v: SourceItemKind) {
@@ -1046,6 +1047,9 @@ mod tests {
         test(15);
         test(16);
         test(17);
+        test(76);
+        test(77);
+        test(78);
         test(81);
         test(195);
         test(277);
@@ -1056,7 +1060,7 @@ mod tests {
         test(526);
         test(999);
         test(1038);
-        test(1_234_567);
+        test(4172);
     }
 
     #[test]

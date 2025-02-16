@@ -313,6 +313,7 @@ const genRecipesRs = (recipes: Recipes) => `\
     }
 
     pub struct RecipeInfo {
+        #[allow(dead_code)]
         pub name: &'static str,
         pub inputs: &'static [ItemKind],
         pub outputs: &'static [ItemKind],

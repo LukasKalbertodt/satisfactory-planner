@@ -1,3 +1,38 @@
+//! Encode the full state as a compact "digest".
+//!
+//! The JSON representation of the state is wastefully large. By using a custom encoding, utilizing
+//! domain knowledge, this can be shrunk down a lot. This is able to store any state, but
+//! user-invisible properties might change, for example:
+//! - Order of nodes or edges
+//! - Position of all nodes might be translated by a global vector
+//!
+//! Again, these things a user cannot observe, so it's fine. It just means an exact JSON roundtrip
+//! cannot be guaranteed.
+//!
+//! The encoding operates on `BitBuf` to not be restricted to byte granularity. Here is an overview
+//! of how data is stored (for more information see the `encode` function):
+//!
+//! - version: 8 bits
+//! - Nodes
+//!     - num nodes: 8 or 16 bits
+//!     - Node positions
+//!     - Node payload
+//! - Edges
+//!     - num edges: 8 or 16 bits
+//!     - edges
+//!
+//! Here is an unordered list of possible improvements:
+//! - Node positions: here is still redundancy. One could use sub-bit encoding, but that requires to
+//!   encode `max_x - min_x` and `max_y - min_y`, which is not worth it for like 10 nodes. There is
+//!   also lots of redundancy that I cannot figure out how to get rid of. Often, the same y occurs.
+//! - Node kind: instead of encoding 3 bits for every node, one could simply encode the number of
+//!   each node kind with sub-bit encoding.
+//! - Recipe kind: one could sort recipe by expected usage, store the maximum recipe kind number and
+//!   then store all recipe kinds with sub-bit coding. One could also order by recipe-kind. Then the
+//!   maximum recipe kind could be implicitly the kind of the first one.
+//! - Edges: instead of treating mergers/splitters as "unknown item" all the time, one can assign
+//!   them once they are connected to something.
+
 use std::{cmp::{max, min}, collections::BTreeMap, num::NonZero, ops::{Add, Not, Shl, Shr, Sub}};
 
 use crate::{gamedata::{ItemKind, RecipeKind, SourceItemKind}, state::{self, HandleId, NodeId}};

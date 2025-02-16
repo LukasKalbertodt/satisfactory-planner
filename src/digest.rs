@@ -1091,7 +1091,7 @@ mod tests {
         test(31);
         test(12345);
         test(72780);
-        test(131072);
+        test(131071);
     }
 
 

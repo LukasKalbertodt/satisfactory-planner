@@ -204,46 +204,44 @@ fn read_recipe_kind(buf: &mut BitReader) -> RecipeKind {
     RecipeKind::try_from(id).unwrap()
 }
 
-fn write_overclock(buf: &mut BitBuf, v: f32) {
-    match v {
+fn write_overclock(buf: &mut BitBuf, v: state::Overclock) {
+    match v.0 {
         // The overclock value is very often 1.0.
-        1.0 => buf.write_bits(0b0, 1),
+        100_0000 => buf.write_bits(0b0, 1),
 
         // Otherwise, in most cases it's 0.5, 1.5, 2.0 or 2.5.
-        0.5 => buf.write_bits(0b1000, 4),
-        1.5 => buf.write_bits(0b1001, 4),
-        2.0 => buf.write_bits(0b1010, 4),
-        2.5 => buf.write_bits(0b1011, 4),
+        50_0000 => buf.write_bits(0b1000, 4),
+        150_0000 => buf.write_bits(0b1001, 4),
+        200_0000 => buf.write_bits(0b1010, 4),
+        250_0000 => buf.write_bits(0b1011, 4),
 
         // Only very rarely it's "any percentage" more precisely: a number between
         // 1% and 250% with 4 decimal digits of precision.
-        _ => {
+        v => {
             // Convert to value between 1_0000 and 250_0000. This can be encoded
             // with 22 bits. 0b11 is used as tag.
-            let int = (v * 100.0 * 1000.0) as u64;
             buf.write_bits(0b11, 2);
-            buf.write_bits(int, 22);
+            buf.write_bits(v.into(), 22);
         }
     }
 }
 
-fn read_overclock(buf: &mut BitReader) -> f32 {
+fn read_overclock(buf: &mut BitReader) -> state::Overclock {
     if buf.read_bits(1) == 0 {
-        return 1.0;
+        return state::Overclock(100_0000);
     }
 
     if buf.read_bits(1) == 0 {
         match buf.read_bits(2) {
-            0b00 => return 0.5,
-            0b01 => return 1.5,
-            0b10 => return 2.0,
-            0b11 => return 2.5,
+            0b00 => return state::Overclock(50_0000),
+            0b01 => return state::Overclock(150_0000),
+            0b10 => return state::Overclock(200_0000),
+            0b11 => return state::Overclock(250_0000),
             _ => unreachable!(),
         }
     }
 
-    let int = buf.read_bits(22);
-    int as f32 / 1000.0 / 100.0
+    state::Overclock(buf.read_bits(22) as u32)
 }
 
 fn write_building_count(buf: &mut BitBuf, v: NonZero<u32>) {
@@ -1011,17 +1009,16 @@ mod tests {
 
     #[test]
     fn overclock() {
-        let test = |v| test_roundtrip(v, write_overclock, read_overclock);
+        let test = |v| test_roundtrip(state::Overclock(v), write_overclock, read_overclock);
 
-        test(1.0);
-        test(0.5);
-        test(1.5);
-        test(2.0);
-        test(2.5);
-        test(0.01);
-        // TODO: float inaccuracy
-        // test(1.33_3333);
-        // test(2.49_9999);
+        test(100_0000);
+        test(050_0000);
+        test(150_0000);
+        test(200_0000);
+        test(250_0000);
+        test(001_0000);
+        test(133_3333);
+        test(249_9999);
     }
 
     #[test]

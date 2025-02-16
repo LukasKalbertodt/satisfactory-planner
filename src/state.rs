@@ -52,7 +52,7 @@ pub enum Node {
         pos: Pos,
         recipe: RecipeKind,
         buildings_count: NonZeroU32,
-        overclock: f32,
+        overclock: Overclock,
     },
     Merger {
         pos: Pos,
@@ -86,4 +86,29 @@ impl Node {
 pub struct Pos {
     pub x: i32,
     pub y: i32,
+}
+
+/// Satisfactory overclock values can be between 1% and 250% with 4 decimal digits of precision.
+/// `f32` cannot correctly represent all values, so we use an int instead that's 10_000 times the
+/// percent value = 1_000_000 times the value. The value inside JSON is from 0.01 to 2.5.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(try_from = "f64", into = "f64")]
+pub struct Overclock(pub u32);
+
+impl Into<f64> for Overclock {
+    fn into(self) -> f64 {
+        (self.0 as f64) / 1_000_000.0
+    }
+}
+
+impl TryFrom<f64> for Overclock {
+    type Error = &'static str;
+
+    fn try_from(value: f64) -> Result<Self, Self::Error> {
+        if !(value >= 0.01 && value <= 2.5) {
+            return Err("overclock value out of range");
+        }
+
+        Ok(Self((value * 1_000_000.0).round() as u32))
+    }
 }

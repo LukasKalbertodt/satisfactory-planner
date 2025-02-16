@@ -23,16 +23,22 @@ pub struct Graph {
     pub edges: Vec<Edge>,
 }
 
+impl Graph {
+    pub fn node(&self, id: NodeId) -> &Node {
+        &self.nodes[id as usize]
+    }
+}
+
 pub type NodeId = u16;
 pub type HandleId = u8;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Edge {
     pub source: GraphHandle,
     pub target: GraphHandle,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 pub struct GraphHandle {
     pub node: NodeId,
     pub handle: HandleId,
@@ -69,6 +75,10 @@ impl Node {
             Node::Splitter { pos, .. } => pos,
             Node::Source { pos, .. } => pos,
         }
+    }
+
+    pub fn is_split_merge(&self) -> bool {
+        matches!(self, Self::Splitter { .. } | Self::Merger { .. })
     }
 }
 

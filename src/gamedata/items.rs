@@ -5,7 +5,7 @@
 // game. See the main README for more information.
 
 
-#[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum ItemKind {
     #[serde(rename = "uranium-waste")]
@@ -475,7 +475,7 @@ impl TryFrom<u8> for ItemKind {
     }
 }
 
-#[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
 pub enum SourceItemKind {
     #[serde(rename = "iron-ore")]

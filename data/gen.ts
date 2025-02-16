@@ -123,7 +123,7 @@ const main = async () => {
     await Deno.writeTextFile("../src/gamedata/items.ts", tsItems);
 
     console.log("Generating output Rust files...");
-    const rustRecipes = genRecipesRs(Object.values(recipes).map(recipe => recipe.id));
+    const rustRecipes = genRecipesRs(recipes);
     await Deno.writeTextFile("../src/gamedata/recipes.rs", rustRecipes);
     const rustItems = genItemsRs(Object.values(items).map(item => item.id), SOURCE_ITEMS);
     await Deno.writeTextFile("../src/gamedata/items.rs", rustItems);
@@ -284,31 +284,53 @@ const genItemsTs = (items: Items) => `\
 
 const toPascalCase = (str: string) => str.replace(/(?:^|-)([a-z0-9])/g, (_, c) => c.toUpperCase());
 
-const genRecipesRs = (recipes: string[]) => `\
+const genRecipesRs = (recipes: Recipes) => `\
     ${FILE_HEADER}
 
-    #[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+    use super::ItemKind;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
     #[repr(u16)]
-    pub enum RecipeKind {${recipes.map((id, idx) => `
-        #[serde(rename = "${id}")]
-        ${toPascalCase(id)} = ${idx},`).join("")}
+    pub enum RecipeKind {${Object.values(recipes).map((recipe, idx) => `
+        #[serde(rename = "${recipe.id}")]
+        ${toPascalCase(recipe.id)} = ${idx},`).join("")}
     }
 
     impl TryFrom<u16> for RecipeKind {
         type Error = ();
         fn try_from(value: u16) -> Result<Self, Self::Error> {
-            match value {${recipes.map((id, idx) => `
-                ${idx} => Ok(Self::${toPascalCase(id)}),`).join("")}
+            match value {${Object.values(recipes).map((recipe, idx) => `
+                ${idx} => Ok(Self::${toPascalCase(recipe.id)}),`).join("")}
                 _ => Err(()),
             }
         }
     }
+
+    impl RecipeKind {
+        pub fn info(self) -> &'static RecipeInfo {
+            &RECIPES[self as u16 as usize]
+        }
+    }
+
+    pub struct RecipeInfo {
+        pub name: &'static str,
+        pub inputs: &'static [ItemKind],
+        pub outputs: &'static [ItemKind],
+    }
+
+    const RECIPES: [RecipeInfo; 278] = [${Object.values(recipes).map(recipe => `
+        RecipeInfo {
+            name: "${recipe.name}",
+            inputs: &[${recipe.inputs.map(i => "ItemKind::" + toPascalCase(i.item)).join(", ")}],
+            outputs: &[${recipe.outputs.map(o => "ItemKind::" + toPascalCase(o.item)).join(", ")}],
+        },`).join("")}
+    ];
 `.replaceAll(/^    /gm, "");
 
 const genItemsRs = (items: string[], sourceItems: string[]) => `\
     ${FILE_HEADER}
 
-    #[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Deserialize, serde::Serialize)]
     #[repr(u8)]
     pub enum ItemKind {${items.map((id, idx) => `
         #[serde(rename = "${id}")]
@@ -325,7 +347,7 @@ const genItemsRs = (items: string[], sourceItems: string[]) => `\
         }
     }
 
-    #[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, serde::Deserialize, serde::Serialize)]
     #[repr(u8)]
     pub enum SourceItemKind {${sourceItems.map((id, idx) => `
         #[serde(rename = "${id}")]

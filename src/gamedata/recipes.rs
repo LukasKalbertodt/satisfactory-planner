@@ -5,7 +5,9 @@
 // game. See the main README for more information.
 
 
-#[derive(Debug, Clone, Copy, serde::Deserialize, serde::Serialize)]
+use super::ItemKind;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
 #[repr(u16)]
 pub enum RecipeKind {
     #[serde(rename = "nuclear-waste")]
@@ -852,3 +854,1408 @@ impl TryFrom<u16> for RecipeKind {
         }
     }
 }
+
+impl RecipeKind {
+    pub fn info(self) -> &'static RecipeInfo {
+        &RECIPES[self as u16 as usize]
+    }
+}
+
+pub struct RecipeInfo {
+    pub name: &'static str,
+    pub inputs: &'static [ItemKind],
+    pub outputs: &'static [ItemKind],
+}
+
+const RECIPES: [RecipeInfo; 278] = [
+    RecipeInfo {
+        name: "Uranium Fuel Rod (burning)",
+        inputs: &[ItemKind::UraniumFuelRod, ItemKind::Water],
+        outputs: &[ItemKind::UraniumWaste],
+    },
+    RecipeInfo {
+        name: "Plutonium Fuel Rod (burning)",
+        inputs: &[ItemKind::PlutoniumFuelRod, ItemKind::Water],
+        outputs: &[ItemKind::PlutoniumWaste],
+    },
+    RecipeInfo {
+        name: "Iron Plate",
+        inputs: &[ItemKind::IronIngot],
+        outputs: &[ItemKind::IronPlate],
+    },
+    RecipeInfo {
+        name: "Iron Rod",
+        inputs: &[ItemKind::IronIngot],
+        outputs: &[ItemKind::IronRod],
+    },
+    RecipeInfo {
+        name: "Iron Ingot",
+        inputs: &[ItemKind::IronOre],
+        outputs: &[ItemKind::IronIngot],
+    },
+    RecipeInfo {
+        name: "Nitro Rocket Fuel",
+        inputs: &[ItemKind::Fuel, ItemKind::NitrogenGas, ItemKind::Sulfur, ItemKind::Coal],
+        outputs: &[ItemKind::RocketFuel, ItemKind::CompactedCoal],
+    },
+    RecipeInfo {
+        name: "Rocket Fuel",
+        inputs: &[ItemKind::Turbofuel, ItemKind::NitricAcid],
+        outputs: &[ItemKind::RocketFuel, ItemKind::CompactedCoal],
+    },
+    RecipeInfo {
+        name: "Packaged Rocket Fuel",
+        inputs: &[ItemKind::RocketFuel, ItemKind::EmptyFluidTank],
+        outputs: &[ItemKind::PackagedRocketFuel],
+    },
+    RecipeInfo {
+        name: "Unpackage Rocket Fuel",
+        inputs: &[ItemKind::PackagedRocketFuel],
+        outputs: &[ItemKind::RocketFuel, ItemKind::EmptyFluidTank],
+    },
+    RecipeInfo {
+        name: "Dark-Ion Fuel",
+        inputs: &[ItemKind::PackagedRocketFuel, ItemKind::DarkMatterCrystal],
+        outputs: &[ItemKind::IonizedFuel, ItemKind::CompactedCoal],
+    },
+    RecipeInfo {
+        name: "Dark Matter Residue",
+        inputs: &[ItemKind::ReanimatedSam],
+        outputs: &[ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Excited Photonic Matter",
+        inputs: &[],
+        outputs: &[ItemKind::ExcitedPhotonicMatter],
+    },
+    RecipeInfo {
+        name: "Dark Matter Crystal",
+        inputs: &[ItemKind::Diamonds, ItemKind::DarkMatterResidue],
+        outputs: &[ItemKind::DarkMatterCrystal],
+    },
+    RecipeInfo {
+        name: "Superposition Oscillator",
+        inputs: &[ItemKind::DarkMatterCrystal, ItemKind::CrystalOscillator, ItemKind::AlcladAluminumSheet, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::SuperpositionOscillator, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Neural-Quantum Processor",
+        inputs: &[ItemKind::TimeCrystal, ItemKind::Supercomputer, ItemKind::FicsiteTrigon, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::NeuralQuantumProcessor, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "AI Expansion Server",
+        inputs: &[ItemKind::MagneticFieldGenerator, ItemKind::NeuralQuantumProcessor, ItemKind::SuperpositionOscillator, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::AiExpansionServer, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Ionized Fuel",
+        inputs: &[ItemKind::RocketFuel, ItemKind::PowerShard],
+        outputs: &[ItemKind::IonizedFuel, ItemKind::CompactedCoal],
+    },
+    RecipeInfo {
+        name: "Packaged Ionized Fuel",
+        inputs: &[ItemKind::IonizedFuel, ItemKind::EmptyFluidTank],
+        outputs: &[ItemKind::PackagedIonizedFuel],
+    },
+    RecipeInfo {
+        name: "Unpackage Ionized Fuel",
+        inputs: &[ItemKind::PackagedIonizedFuel],
+        outputs: &[ItemKind::IonizedFuel, ItemKind::EmptyFluidTank],
+    },
+    RecipeInfo {
+        name: "Turbo Diamonds",
+        inputs: &[ItemKind::Coal, ItemKind::PackagedTurbofuel],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "SAM Fluctuator",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Wire, ItemKind::SteelPipe],
+        outputs: &[ItemKind::SamFluctuator],
+    },
+    RecipeInfo {
+        name: "Ficsite Trigon",
+        inputs: &[ItemKind::FicsiteIngot],
+        outputs: &[ItemKind::FicsiteTrigon],
+    },
+    RecipeInfo {
+        name: "Ficsite Ingot (Iron)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::IronIngot],
+        outputs: &[ItemKind::FicsiteIngot],
+    },
+    RecipeInfo {
+        name: "Time Crystal",
+        inputs: &[ItemKind::Diamonds],
+        outputs: &[ItemKind::TimeCrystal],
+    },
+    RecipeInfo {
+        name: "Diamonds",
+        inputs: &[ItemKind::Coal],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "Reanimated SAM",
+        inputs: &[ItemKind::Sam],
+        outputs: &[ItemKind::ReanimatedSam],
+    },
+    RecipeInfo {
+        name: "Biochemical Sculptor",
+        inputs: &[ItemKind::AssemblyDirectorSystem, ItemKind::FicsiteTrigon, ItemKind::Water],
+        outputs: &[ItemKind::BiochemicalSculptor],
+    },
+    RecipeInfo {
+        name: "Ficsite Ingot (Aluminum)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::AluminumIngot],
+        outputs: &[ItemKind::FicsiteIngot],
+    },
+    RecipeInfo {
+        name: "Ficsite Ingot (Caterium)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::CateriumIngot],
+        outputs: &[ItemKind::FicsiteIngot],
+    },
+    RecipeInfo {
+        name: "Bauxite (Caterium)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::CateriumOre],
+        outputs: &[ItemKind::Bauxite],
+    },
+    RecipeInfo {
+        name: "Bauxite (Copper)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::CopperOre],
+        outputs: &[ItemKind::Bauxite],
+    },
+    RecipeInfo {
+        name: "Caterium Ore (Copper)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::CopperOre],
+        outputs: &[ItemKind::CateriumOre],
+    },
+    RecipeInfo {
+        name: "Caterium Ore (Quartz)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::RawQuartz],
+        outputs: &[ItemKind::CateriumOre],
+    },
+    RecipeInfo {
+        name: "Coal (Iron)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::IronOre],
+        outputs: &[ItemKind::Coal],
+    },
+    RecipeInfo {
+        name: "Coal (Limestone)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Limestone],
+        outputs: &[ItemKind::Coal],
+    },
+    RecipeInfo {
+        name: "Copper Ore (Quartz)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::RawQuartz],
+        outputs: &[ItemKind::CopperOre],
+    },
+    RecipeInfo {
+        name: "Copper Ore (Sulfur)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Sulfur],
+        outputs: &[ItemKind::CopperOre],
+    },
+    RecipeInfo {
+        name: "Iron Ore (Limestone)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Limestone],
+        outputs: &[ItemKind::IronOre],
+    },
+    RecipeInfo {
+        name: "Limestone (Sulfur)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Sulfur],
+        outputs: &[ItemKind::Limestone],
+    },
+    RecipeInfo {
+        name: "Nitrogen Gas (Bauxite)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Bauxite],
+        outputs: &[ItemKind::NitrogenGas],
+    },
+    RecipeInfo {
+        name: "Nitrogen Gas (Caterium)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::CateriumOre],
+        outputs: &[ItemKind::NitrogenGas],
+    },
+    RecipeInfo {
+        name: "Raw Quartz (Bauxite)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Bauxite],
+        outputs: &[ItemKind::RawQuartz],
+    },
+    RecipeInfo {
+        name: "Raw Quartz (Coal)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Coal],
+        outputs: &[ItemKind::RawQuartz],
+    },
+    RecipeInfo {
+        name: "Sulfur (Coal)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Coal],
+        outputs: &[ItemKind::Sulfur],
+    },
+    RecipeInfo {
+        name: "Sulfur (Iron)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::IronOre],
+        outputs: &[ItemKind::Sulfur],
+    },
+    RecipeInfo {
+        name: "Uranium Ore (Bauxite)",
+        inputs: &[ItemKind::ReanimatedSam, ItemKind::Bauxite],
+        outputs: &[ItemKind::Uranium],
+    },
+    RecipeInfo {
+        name: "Turbofuel",
+        inputs: &[ItemKind::Fuel, ItemKind::CompactedCoal],
+        outputs: &[ItemKind::Turbofuel],
+    },
+    RecipeInfo {
+        name: "Packaged Turbofuel",
+        inputs: &[ItemKind::Turbofuel, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedTurbofuel],
+    },
+    RecipeInfo {
+        name: "Unpackage Turbofuel",
+        inputs: &[ItemKind::PackagedTurbofuel],
+        outputs: &[ItemKind::Turbofuel, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Charcoal",
+        inputs: &[ItemKind::Wood],
+        outputs: &[ItemKind::Coal],
+    },
+    RecipeInfo {
+        name: "Biocoal",
+        inputs: &[ItemKind::Biomass],
+        outputs: &[ItemKind::Coal],
+    },
+    RecipeInfo {
+        name: "Compacted Coal",
+        inputs: &[ItemKind::Coal, ItemKind::Sulfur],
+        outputs: &[ItemKind::CompactedCoal],
+    },
+    RecipeInfo {
+        name: "Circuit Board",
+        inputs: &[ItemKind::CopperSheet, ItemKind::Plastic],
+        outputs: &[ItemKind::CircuitBoard],
+    },
+    RecipeInfo {
+        name: "Fuel",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::Fuel, ItemKind::PolymerResin],
+    },
+    RecipeInfo {
+        name: "Petroleum Coke",
+        inputs: &[ItemKind::HeavyOilResidue],
+        outputs: &[ItemKind::PetroleumCoke],
+    },
+    RecipeInfo {
+        name: "Plastic",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::Plastic, ItemKind::HeavyOilResidue],
+    },
+    RecipeInfo {
+        name: "Rubber",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::Rubber, ItemKind::HeavyOilResidue],
+    },
+    RecipeInfo {
+        name: "Residual Fuel",
+        inputs: &[ItemKind::HeavyOilResidue],
+        outputs: &[ItemKind::Fuel],
+    },
+    RecipeInfo {
+        name: "Residual Plastic",
+        inputs: &[ItemKind::PolymerResin, ItemKind::Water],
+        outputs: &[ItemKind::Plastic],
+    },
+    RecipeInfo {
+        name: "Residual Rubber",
+        inputs: &[ItemKind::PolymerResin, ItemKind::Water],
+        outputs: &[ItemKind::Rubber],
+    },
+    RecipeInfo {
+        name: "Pink Diamonds",
+        inputs: &[ItemKind::Coal, ItemKind::QuartzCrystal],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "Petroleum Diamonds",
+        inputs: &[ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "Oil-Based Diamonds",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "Cloudy Diamonds",
+        inputs: &[ItemKind::Coal, ItemKind::Limestone],
+        outputs: &[ItemKind::Diamonds],
+    },
+    RecipeInfo {
+        name: "Dark Matter Trap",
+        inputs: &[ItemKind::TimeCrystal, ItemKind::DarkMatterResidue],
+        outputs: &[ItemKind::DarkMatterCrystal],
+    },
+    RecipeInfo {
+        name: "Dark Matter Crystallization",
+        inputs: &[ItemKind::DarkMatterResidue],
+        outputs: &[ItemKind::DarkMatterCrystal],
+    },
+    RecipeInfo {
+        name: "Wet Concrete",
+        inputs: &[ItemKind::Limestone, ItemKind::Water],
+        outputs: &[ItemKind::Concrete],
+    },
+    RecipeInfo {
+        name: "Turbo Heavy Fuel",
+        inputs: &[ItemKind::HeavyOilResidue, ItemKind::CompactedCoal],
+        outputs: &[ItemKind::Turbofuel],
+    },
+    RecipeInfo {
+        name: "Steel Rod",
+        inputs: &[ItemKind::SteelIngot],
+        outputs: &[ItemKind::IronRod],
+    },
+    RecipeInfo {
+        name: "Steel Beam",
+        inputs: &[ItemKind::SteelIngot],
+        outputs: &[ItemKind::SteelBeam],
+    },
+    RecipeInfo {
+        name: "Steel Pipe",
+        inputs: &[ItemKind::SteelIngot],
+        outputs: &[ItemKind::SteelPipe],
+    },
+    RecipeInfo {
+        name: "Steel Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::Coal],
+        outputs: &[ItemKind::SteelIngot],
+    },
+    RecipeInfo {
+        name: "Versatile Framework",
+        inputs: &[ItemKind::ModularFrame, ItemKind::SteelBeam],
+        outputs: &[ItemKind::VersatileFramework],
+    },
+    RecipeInfo {
+        name: "Steel Canister",
+        inputs: &[ItemKind::SteelIngot],
+        outputs: &[ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Empty Canister",
+        inputs: &[ItemKind::Plastic],
+        outputs: &[ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Packaged Fuel",
+        inputs: &[ItemKind::Fuel, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedFuel],
+    },
+    RecipeInfo {
+        name: "Liquid Biofuel",
+        inputs: &[ItemKind::SolidBiofuel, ItemKind::Water],
+        outputs: &[ItemKind::LiquidBiofuel],
+    },
+    RecipeInfo {
+        name: "Packaged Liquid Biofuel",
+        inputs: &[ItemKind::LiquidBiofuel, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedLiquidBiofuel],
+    },
+    RecipeInfo {
+        name: "Packaged Oil",
+        inputs: &[ItemKind::CrudeOil, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedOil],
+    },
+    RecipeInfo {
+        name: "Packaged Heavy Oil Residue",
+        inputs: &[ItemKind::HeavyOilResidue, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedHeavyOilResidue],
+    },
+    RecipeInfo {
+        name: "Packaged Water",
+        inputs: &[ItemKind::Water, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedWater],
+    },
+    RecipeInfo {
+        name: "Unpackage Liquid Biofuel",
+        inputs: &[ItemKind::PackagedLiquidBiofuel],
+        outputs: &[ItemKind::LiquidBiofuel, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Unpackage Fuel",
+        inputs: &[ItemKind::PackagedFuel],
+        outputs: &[ItemKind::Fuel, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Unpackage Oil",
+        inputs: &[ItemKind::PackagedOil],
+        outputs: &[ItemKind::CrudeOil, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Unpackage Heavy Oil Residue",
+        inputs: &[ItemKind::PackagedHeavyOilResidue],
+        outputs: &[ItemKind::HeavyOilResidue, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Unpackage Water",
+        inputs: &[ItemKind::PackagedWater],
+        outputs: &[ItemKind::Water, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Steamed Copper Sheet",
+        inputs: &[ItemKind::CopperIngot, ItemKind::Water],
+        outputs: &[ItemKind::CopperSheet],
+    },
+    RecipeInfo {
+        name: "Rubber Concrete",
+        inputs: &[ItemKind::Limestone, ItemKind::Rubber],
+        outputs: &[ItemKind::Concrete],
+    },
+    RecipeInfo {
+        name: "Recycled Rubber",
+        inputs: &[ItemKind::Plastic, ItemKind::Fuel],
+        outputs: &[ItemKind::Rubber],
+    },
+    RecipeInfo {
+        name: "Pure Quartz Crystal",
+        inputs: &[ItemKind::RawQuartz, ItemKind::Water],
+        outputs: &[ItemKind::QuartzCrystal],
+    },
+    RecipeInfo {
+        name: "Quartz Crystal",
+        inputs: &[ItemKind::RawQuartz],
+        outputs: &[ItemKind::QuartzCrystal],
+    },
+    RecipeInfo {
+        name: "Pure Iron Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::Water],
+        outputs: &[ItemKind::IronIngot],
+    },
+    RecipeInfo {
+        name: "Pure Copper Ingot",
+        inputs: &[ItemKind::CopperOre, ItemKind::Water],
+        outputs: &[ItemKind::CopperIngot],
+    },
+    RecipeInfo {
+        name: "Pure Caterium Ingot",
+        inputs: &[ItemKind::CateriumOre, ItemKind::Water],
+        outputs: &[ItemKind::CateriumIngot],
+    },
+    RecipeInfo {
+        name: "Pure Aluminum Ingot",
+        inputs: &[ItemKind::AluminumScrap],
+        outputs: &[ItemKind::AluminumIngot],
+    },
+    RecipeInfo {
+        name: "Aluminum Casing",
+        inputs: &[ItemKind::AluminumIngot],
+        outputs: &[ItemKind::AluminumCasing],
+    },
+    RecipeInfo {
+        name: "Alclad Aluminum Sheet",
+        inputs: &[ItemKind::AluminumIngot, ItemKind::CopperIngot],
+        outputs: &[ItemKind::AlcladAluminumSheet],
+    },
+    RecipeInfo {
+        name: "Alumina Solution",
+        inputs: &[ItemKind::Bauxite, ItemKind::Water],
+        outputs: &[ItemKind::AluminaSolution, ItemKind::Silica],
+    },
+    RecipeInfo {
+        name: "Aluminum Scrap",
+        inputs: &[ItemKind::AluminaSolution, ItemKind::Coal],
+        outputs: &[ItemKind::AluminumScrap, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Packaged Alumina Solution",
+        inputs: &[ItemKind::AluminaSolution, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedAluminaSolution],
+    },
+    RecipeInfo {
+        name: "Aluminum Ingot",
+        inputs: &[ItemKind::AluminumScrap, ItemKind::Silica],
+        outputs: &[ItemKind::AluminumIngot],
+    },
+    RecipeInfo {
+        name: "Silica",
+        inputs: &[ItemKind::RawQuartz],
+        outputs: &[ItemKind::Silica],
+    },
+    RecipeInfo {
+        name: "Crystal Oscillator",
+        inputs: &[ItemKind::QuartzCrystal, ItemKind::Cable, ItemKind::ReinforcedIronPlate],
+        outputs: &[ItemKind::CrystalOscillator],
+    },
+    RecipeInfo {
+        name: "Unpackage Alumina Solution",
+        inputs: &[ItemKind::PackagedAluminaSolution],
+        outputs: &[ItemKind::AluminaSolution, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Polymer Resin",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::PolymerResin, ItemKind::HeavyOilResidue],
+    },
+    RecipeInfo {
+        name: "Plastic Smart Plating",
+        inputs: &[ItemKind::ReinforcedIronPlate, ItemKind::Rotor, ItemKind::Plastic],
+        outputs: &[ItemKind::SmartPlating],
+    },
+    RecipeInfo {
+        name: "Automated Speed Wiring",
+        inputs: &[ItemKind::Stator, ItemKind::Wire, ItemKind::HighSpeedConnector],
+        outputs: &[ItemKind::AutomatedWiring],
+    },
+    RecipeInfo {
+        name: "Encased Industrial Beam",
+        inputs: &[ItemKind::SteelBeam, ItemKind::Concrete],
+        outputs: &[ItemKind::EncasedIndustrialBeam],
+    },
+    RecipeInfo {
+        name: "Motor",
+        inputs: &[ItemKind::Rotor, ItemKind::Stator],
+        outputs: &[ItemKind::Motor],
+    },
+    RecipeInfo {
+        name: "Stator",
+        inputs: &[ItemKind::SteelPipe, ItemKind::Wire],
+        outputs: &[ItemKind::Stator],
+    },
+    RecipeInfo {
+        name: "Automated Wiring",
+        inputs: &[ItemKind::Stator, ItemKind::Cable],
+        outputs: &[ItemKind::AutomatedWiring],
+    },
+    RecipeInfo {
+        name: "AI Limiter",
+        inputs: &[ItemKind::CopperSheet, ItemKind::Quickwire],
+        outputs: &[ItemKind::AiLimiter],
+    },
+    RecipeInfo {
+        name: "Heavy Oil Residue",
+        inputs: &[ItemKind::CrudeOil],
+        outputs: &[ItemKind::HeavyOilResidue, ItemKind::PolymerResin],
+    },
+    RecipeInfo {
+        name: "Heavy Flexible Frame",
+        inputs: &[ItemKind::ModularFrame, ItemKind::EncasedIndustrialBeam, ItemKind::Rubber, ItemKind::Screw],
+        outputs: &[ItemKind::HeavyModularFrame],
+    },
+    RecipeInfo {
+        name: "Computer",
+        inputs: &[ItemKind::CircuitBoard, ItemKind::Cable, ItemKind::Plastic],
+        outputs: &[ItemKind::Computer],
+    },
+    RecipeInfo {
+        name: "Heavy Modular Frame",
+        inputs: &[ItemKind::ModularFrame, ItemKind::SteelPipe, ItemKind::EncasedIndustrialBeam, ItemKind::Screw],
+        outputs: &[ItemKind::HeavyModularFrame],
+    },
+    RecipeInfo {
+        name: "Modular Engine",
+        inputs: &[ItemKind::Motor, ItemKind::Rubber, ItemKind::SmartPlating],
+        outputs: &[ItemKind::ModularEngine],
+    },
+    RecipeInfo {
+        name: "Adaptive Control Unit",
+        inputs: &[ItemKind::AutomatedWiring, ItemKind::CircuitBoard, ItemKind::HeavyModularFrame, ItemKind::Computer],
+        outputs: &[ItemKind::AdaptiveControlUnit],
+    },
+    RecipeInfo {
+        name: "Fused Wire",
+        inputs: &[ItemKind::CopperIngot, ItemKind::CateriumIngot],
+        outputs: &[ItemKind::Wire],
+    },
+    RecipeInfo {
+        name: "Flexible Framework",
+        inputs: &[ItemKind::ModularFrame, ItemKind::SteelBeam, ItemKind::Rubber],
+        outputs: &[ItemKind::VersatileFramework],
+    },
+    RecipeInfo {
+        name: "Electrode Circuit Board",
+        inputs: &[ItemKind::Rubber, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::CircuitBoard],
+    },
+    RecipeInfo {
+        name: "Electrode Aluminum Scrap",
+        inputs: &[ItemKind::AluminaSolution, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::AluminumScrap, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Diluted Packaged Fuel",
+        inputs: &[ItemKind::HeavyOilResidue, ItemKind::PackagedWater],
+        outputs: &[ItemKind::PackagedFuel],
+    },
+    RecipeInfo {
+        name: "Copper Rotor",
+        inputs: &[ItemKind::CopperSheet, ItemKind::Screw],
+        outputs: &[ItemKind::Rotor],
+    },
+    RecipeInfo {
+        name: "Modular Frame",
+        inputs: &[ItemKind::ReinforcedIronPlate, ItemKind::IronRod],
+        outputs: &[ItemKind::ModularFrame],
+    },
+    RecipeInfo {
+        name: "Rotor",
+        inputs: &[ItemKind::IronRod, ItemKind::Screw],
+        outputs: &[ItemKind::Rotor],
+    },
+    RecipeInfo {
+        name: "Copper Sheet",
+        inputs: &[ItemKind::CopperIngot],
+        outputs: &[ItemKind::CopperSheet],
+    },
+    RecipeInfo {
+        name: "Smart Plating",
+        inputs: &[ItemKind::ReinforcedIronPlate, ItemKind::Rotor],
+        outputs: &[ItemKind::SmartPlating],
+    },
+    RecipeInfo {
+        name: "Copper Alloy Ingot",
+        inputs: &[ItemKind::CopperOre, ItemKind::IronOre],
+        outputs: &[ItemKind::CopperIngot],
+    },
+    RecipeInfo {
+        name: "Coke Steel Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::SteelIngot],
+    },
+    RecipeInfo {
+        name: "Coated Iron Plate",
+        inputs: &[ItemKind::IronIngot, ItemKind::Plastic],
+        outputs: &[ItemKind::IronPlate],
+    },
+    RecipeInfo {
+        name: "Coated Iron Canister",
+        inputs: &[ItemKind::IronPlate, ItemKind::CopperSheet],
+        outputs: &[ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Coated Cable",
+        inputs: &[ItemKind::Wire, ItemKind::HeavyOilResidue],
+        outputs: &[ItemKind::Cable],
+    },
+    RecipeInfo {
+        name: "Bolted Frame",
+        inputs: &[ItemKind::ReinforcedIronPlate, ItemKind::Screw],
+        outputs: &[ItemKind::ModularFrame],
+    },
+    RecipeInfo {
+        name: "Adhered Iron Plate",
+        inputs: &[ItemKind::IronPlate, ItemKind::Rubber],
+        outputs: &[ItemKind::ReinforcedIronPlate],
+    },
+    RecipeInfo {
+        name: "Turbo Pressure Motor",
+        inputs: &[ItemKind::Motor, ItemKind::PressureConversionCube, ItemKind::PackagedNitrogenGas, ItemKind::Stator],
+        outputs: &[ItemKind::TurboMotor],
+    },
+    RecipeInfo {
+        name: "Encased Plutonium Cell",
+        inputs: &[ItemKind::PlutoniumPellet, ItemKind::Concrete],
+        outputs: &[ItemKind::EncasedPlutoniumCell],
+    },
+    RecipeInfo {
+        name: "Pressure Conversion Cube",
+        inputs: &[ItemKind::FusedModularFrame, ItemKind::RadioControlUnit],
+        outputs: &[ItemKind::PressureConversionCube],
+    },
+    RecipeInfo {
+        name: "Nitric Acid",
+        inputs: &[ItemKind::NitrogenGas, ItemKind::Water, ItemKind::IronPlate],
+        outputs: &[ItemKind::NitricAcid],
+    },
+    RecipeInfo {
+        name: "Non-Fissile Uranium",
+        inputs: &[ItemKind::UraniumWaste, ItemKind::Silica, ItemKind::NitricAcid, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::NonFissileUranium, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Copper Powder",
+        inputs: &[ItemKind::CopperIngot],
+        outputs: &[ItemKind::CopperPowder],
+    },
+    RecipeInfo {
+        name: "Plutonium Pellet",
+        inputs: &[ItemKind::NonFissileUranium, ItemKind::UraniumWaste],
+        outputs: &[ItemKind::PlutoniumPellet],
+    },
+    RecipeInfo {
+        name: "Plutonium Fuel Rod",
+        inputs: &[ItemKind::EncasedPlutoniumCell, ItemKind::SteelBeam, ItemKind::ElectromagneticControlRod, ItemKind::HeatSink],
+        outputs: &[ItemKind::PlutoniumFuelRod],
+    },
+    RecipeInfo {
+        name: "Packaged Nitric Acid",
+        inputs: &[ItemKind::NitricAcid, ItemKind::EmptyFluidTank],
+        outputs: &[ItemKind::PackagedNitricAcid],
+    },
+    RecipeInfo {
+        name: "Nuclear Pasta",
+        inputs: &[ItemKind::CopperPowder, ItemKind::PressureConversionCube],
+        outputs: &[ItemKind::NuclearPasta],
+    },
+    RecipeInfo {
+        name: "Unpackage Nitric Acid",
+        inputs: &[ItemKind::PackagedNitricAcid],
+        outputs: &[ItemKind::NitricAcid, ItemKind::EmptyFluidTank],
+    },
+    RecipeInfo {
+        name: "Turbo Blend Fuel",
+        inputs: &[ItemKind::Fuel, ItemKind::HeavyOilResidue, ItemKind::Sulfur, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::Turbofuel],
+    },
+    RecipeInfo {
+        name: "Encased Uranium Cell",
+        inputs: &[ItemKind::Uranium, ItemKind::Concrete, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::EncasedUraniumCell, ItemKind::SulfuricAcid],
+    },
+    RecipeInfo {
+        name: "Cooling System",
+        inputs: &[ItemKind::HeatSink, ItemKind::Rubber, ItemKind::Water, ItemKind::NitrogenGas],
+        outputs: &[ItemKind::CoolingSystem],
+    },
+    RecipeInfo {
+        name: "Battery",
+        inputs: &[ItemKind::SulfuricAcid, ItemKind::AluminaSolution, ItemKind::AluminumCasing],
+        outputs: &[ItemKind::Battery, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Supercomputer",
+        inputs: &[ItemKind::Computer, ItemKind::AiLimiter, ItemKind::HighSpeedConnector, ItemKind::Plastic],
+        outputs: &[ItemKind::Supercomputer],
+    },
+    RecipeInfo {
+        name: "Radio Control Unit",
+        inputs: &[ItemKind::AluminumCasing, ItemKind::CrystalOscillator, ItemKind::Computer],
+        outputs: &[ItemKind::RadioControlUnit],
+    },
+    RecipeInfo {
+        name: "Sulfuric Acid",
+        inputs: &[ItemKind::Sulfur, ItemKind::Water],
+        outputs: &[ItemKind::SulfuricAcid],
+    },
+    RecipeInfo {
+        name: "Packaged Sulfuric Acid",
+        inputs: &[ItemKind::SulfuricAcid, ItemKind::EmptyCanister],
+        outputs: &[ItemKind::PackagedSulfuricAcid],
+    },
+    RecipeInfo {
+        name: "Assembly Director System",
+        inputs: &[ItemKind::AdaptiveControlUnit, ItemKind::Supercomputer],
+        outputs: &[ItemKind::AssemblyDirectorSystem],
+    },
+    RecipeInfo {
+        name: "High-Speed Connector",
+        inputs: &[ItemKind::Quickwire, ItemKind::Cable, ItemKind::CircuitBoard],
+        outputs: &[ItemKind::HighSpeedConnector],
+    },
+    RecipeInfo {
+        name: "Unpackage Sulfuric Acid",
+        inputs: &[ItemKind::PackagedSulfuricAcid],
+        outputs: &[ItemKind::SulfuricAcid, ItemKind::EmptyCanister],
+    },
+    RecipeInfo {
+        name: "Super-State Computer",
+        inputs: &[ItemKind::Computer, ItemKind::ElectromagneticControlRod, ItemKind::Battery, ItemKind::Wire],
+        outputs: &[ItemKind::Supercomputer],
+    },
+    RecipeInfo {
+        name: "Electromagnetic Control Rod",
+        inputs: &[ItemKind::Stator, ItemKind::AiLimiter],
+        outputs: &[ItemKind::ElectromagneticControlRod],
+    },
+    RecipeInfo {
+        name: "Uranium Fuel Rod",
+        inputs: &[ItemKind::EncasedUraniumCell, ItemKind::EncasedIndustrialBeam, ItemKind::ElectromagneticControlRod],
+        outputs: &[ItemKind::UraniumFuelRod],
+    },
+    RecipeInfo {
+        name: "Magnetic Field Generator",
+        inputs: &[ItemKind::VersatileFramework, ItemKind::ElectromagneticControlRod],
+        outputs: &[ItemKind::MagneticFieldGenerator],
+    },
+    RecipeInfo {
+        name: "Sloppy Alumina",
+        inputs: &[ItemKind::Bauxite, ItemKind::Water],
+        outputs: &[ItemKind::AluminaSolution],
+    },
+    RecipeInfo {
+        name: "Radio Control System",
+        inputs: &[ItemKind::CrystalOscillator, ItemKind::CircuitBoard, ItemKind::AluminumCasing, ItemKind::Rubber],
+        outputs: &[ItemKind::RadioControlUnit],
+    },
+    RecipeInfo {
+        name: "Plutonium Fuel Unit",
+        inputs: &[ItemKind::EncasedPlutoniumCell, ItemKind::PressureConversionCube],
+        outputs: &[ItemKind::PlutoniumFuelRod],
+    },
+    RecipeInfo {
+        name: "OC Supercomputer",
+        inputs: &[ItemKind::RadioControlUnit, ItemKind::CoolingSystem],
+        outputs: &[ItemKind::Supercomputer],
+    },
+    RecipeInfo {
+        name: "Heat Sink",
+        inputs: &[ItemKind::AlcladAluminumSheet, ItemKind::CopperSheet],
+        outputs: &[ItemKind::HeatSink],
+    },
+    RecipeInfo {
+        name: "Fused Modular Frame",
+        inputs: &[ItemKind::HeavyModularFrame, ItemKind::AluminumCasing, ItemKind::NitrogenGas],
+        outputs: &[ItemKind::FusedModularFrame],
+    },
+    RecipeInfo {
+        name: "Empty Fluid Tank",
+        inputs: &[ItemKind::AluminumIngot],
+        outputs: &[ItemKind::EmptyFluidTank],
+    },
+    RecipeInfo {
+        name: "Packaged Nitrogen Gas",
+        inputs: &[ItemKind::NitrogenGas, ItemKind::EmptyFluidTank],
+        outputs: &[ItemKind::PackagedNitrogenGas],
+    },
+    RecipeInfo {
+        name: "Unpackage Nitrogen Gas",
+        inputs: &[ItemKind::PackagedNitrogenGas],
+        outputs: &[ItemKind::NitrogenGas, ItemKind::EmptyFluidTank],
+    },
+    RecipeInfo {
+        name: "Instant Scrap",
+        inputs: &[ItemKind::Bauxite, ItemKind::Coal, ItemKind::SulfuricAcid, ItemKind::Water],
+        outputs: &[ItemKind::AluminumScrap, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Instant Plutonium Cell",
+        inputs: &[ItemKind::NonFissileUranium, ItemKind::AluminumCasing],
+        outputs: &[ItemKind::EncasedPlutoniumCell],
+    },
+    RecipeInfo {
+        name: "Heat-Fused Frame",
+        inputs: &[ItemKind::HeavyModularFrame, ItemKind::AluminumIngot, ItemKind::NitricAcid, ItemKind::Fuel],
+        outputs: &[ItemKind::FusedModularFrame],
+    },
+    RecipeInfo {
+        name: "Fertile Uranium",
+        inputs: &[ItemKind::Uranium, ItemKind::UraniumWaste, ItemKind::NitricAcid, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::NonFissileUranium, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Electric Motor",
+        inputs: &[ItemKind::ElectromagneticControlRod, ItemKind::Rotor],
+        outputs: &[ItemKind::Motor],
+    },
+    RecipeInfo {
+        name: "Diluted Fuel",
+        inputs: &[ItemKind::HeavyOilResidue, ItemKind::Water],
+        outputs: &[ItemKind::Fuel],
+    },
+    RecipeInfo {
+        name: "Cooling Device",
+        inputs: &[ItemKind::HeatSink, ItemKind::Motor, ItemKind::NitrogenGas],
+        outputs: &[ItemKind::CoolingSystem],
+    },
+    RecipeInfo {
+        name: "Classic Battery",
+        inputs: &[ItemKind::Sulfur, ItemKind::AlcladAluminumSheet, ItemKind::Plastic, ItemKind::Wire],
+        outputs: &[ItemKind::Battery],
+    },
+    RecipeInfo {
+        name: "Automated Miner",
+        inputs: &[ItemKind::SteelPipe, ItemKind::IronPlate],
+        outputs: &[ItemKind::PortableMiner],
+    },
+    RecipeInfo {
+        name: "Alclad Casing",
+        inputs: &[ItemKind::AluminumIngot, ItemKind::CopperIngot],
+        outputs: &[ItemKind::AluminumCasing],
+    },
+    RecipeInfo {
+        name: "Molded Steel Pipe",
+        inputs: &[ItemKind::SteelIngot, ItemKind::Concrete],
+        outputs: &[ItemKind::SteelPipe],
+    },
+    RecipeInfo {
+        name: "Iron Pipe",
+        inputs: &[ItemKind::IronIngot],
+        outputs: &[ItemKind::SteelPipe],
+    },
+    RecipeInfo {
+        name: "Steel Cast Plate",
+        inputs: &[ItemKind::IronIngot, ItemKind::SteelIngot],
+        outputs: &[ItemKind::IronPlate],
+    },
+    RecipeInfo {
+        name: "Molded Beam",
+        inputs: &[ItemKind::SteelIngot, ItemKind::Concrete],
+        outputs: &[ItemKind::SteelBeam],
+    },
+    RecipeInfo {
+        name: "Aluminum Beam",
+        inputs: &[ItemKind::AluminumIngot],
+        outputs: &[ItemKind::SteelBeam],
+    },
+    RecipeInfo {
+        name: "Aluminum Rod",
+        inputs: &[ItemKind::AluminumIngot],
+        outputs: &[ItemKind::IronRod],
+    },
+    RecipeInfo {
+        name: "Plastic AI Limiter",
+        inputs: &[ItemKind::Quickwire, ItemKind::Plastic],
+        outputs: &[ItemKind::AiLimiter],
+    },
+    RecipeInfo {
+        name: "Distilled Silica",
+        inputs: &[ItemKind::DissolvedSilica, ItemKind::Limestone, ItemKind::Water],
+        outputs: &[ItemKind::Silica, ItemKind::Water],
+    },
+    RecipeInfo {
+        name: "Quartz Purification",
+        inputs: &[ItemKind::RawQuartz, ItemKind::NitricAcid],
+        outputs: &[ItemKind::QuartzCrystal, ItemKind::DissolvedSilica],
+    },
+    RecipeInfo {
+        name: "Fused Quartz Crystal",
+        inputs: &[ItemKind::RawQuartz, ItemKind::Coal],
+        outputs: &[ItemKind::QuartzCrystal],
+    },
+    RecipeInfo {
+        name: "Leached Iron ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::IronIngot],
+    },
+    RecipeInfo {
+        name: "Basic Iron Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::Limestone],
+        outputs: &[ItemKind::IronIngot],
+    },
+    RecipeInfo {
+        name: "Tempered Copper Ingot",
+        inputs: &[ItemKind::CopperOre, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::CopperIngot],
+    },
+    RecipeInfo {
+        name: "Leached Copper Ingot",
+        inputs: &[ItemKind::CopperOre, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::CopperIngot],
+    },
+    RecipeInfo {
+        name: "Tempered Caterium Ingot",
+        inputs: &[ItemKind::CateriumOre, ItemKind::PetroleumCoke],
+        outputs: &[ItemKind::CateriumIngot],
+    },
+    RecipeInfo {
+        name: "Leached Caterium Ingot",
+        inputs: &[ItemKind::CateriumOre, ItemKind::SulfuricAcid],
+        outputs: &[ItemKind::CateriumIngot],
+    },
+    RecipeInfo {
+        name: "Caterium Wire",
+        inputs: &[ItemKind::CateriumIngot],
+        outputs: &[ItemKind::Wire],
+    },
+    RecipeInfo {
+        name: "Iron Wire",
+        inputs: &[ItemKind::IronIngot],
+        outputs: &[ItemKind::Wire],
+    },
+    RecipeInfo {
+        name: "Infused Uranium Cell",
+        inputs: &[ItemKind::Uranium, ItemKind::Silica, ItemKind::Sulfur, ItemKind::Quickwire],
+        outputs: &[ItemKind::EncasedUraniumCell],
+    },
+    RecipeInfo {
+        name: "Caterium Ingot",
+        inputs: &[ItemKind::CateriumOre],
+        outputs: &[ItemKind::CateriumIngot],
+    },
+    RecipeInfo {
+        name: "Turbo Electric Motor",
+        inputs: &[ItemKind::Motor, ItemKind::RadioControlUnit, ItemKind::ElectromagneticControlRod, ItemKind::Rotor],
+        outputs: &[ItemKind::TurboMotor],
+    },
+    RecipeInfo {
+        name: "Turbo Motor",
+        inputs: &[ItemKind::CoolingSystem, ItemKind::RadioControlUnit, ItemKind::Motor, ItemKind::Rubber],
+        outputs: &[ItemKind::TurboMotor],
+    },
+    RecipeInfo {
+        name: "Thermal Propulsion Rocket",
+        inputs: &[ItemKind::ModularEngine, ItemKind::TurboMotor, ItemKind::CoolingSystem, ItemKind::FusedModularFrame],
+        outputs: &[ItemKind::ThermalPropulsionRocket],
+    },
+    RecipeInfo {
+        name: "Quickwire Stator",
+        inputs: &[ItemKind::SteelPipe, ItemKind::Quickwire],
+        outputs: &[ItemKind::Stator],
+    },
+    RecipeInfo {
+        name: "Cheap Silica",
+        inputs: &[ItemKind::RawQuartz, ItemKind::Limestone],
+        outputs: &[ItemKind::Silica],
+    },
+    RecipeInfo {
+        name: "Steel Screw",
+        inputs: &[ItemKind::SteelBeam],
+        outputs: &[ItemKind::Screw],
+    },
+    RecipeInfo {
+        name: "Cast Screw",
+        inputs: &[ItemKind::IronIngot],
+        outputs: &[ItemKind::Screw],
+    },
+    RecipeInfo {
+        name: "Steel Rotor",
+        inputs: &[ItemKind::SteelPipe, ItemKind::Wire],
+        outputs: &[ItemKind::Rotor],
+    },
+    RecipeInfo {
+        name: "Encased Industrial Pipe",
+        inputs: &[ItemKind::SteelPipe, ItemKind::Concrete],
+        outputs: &[ItemKind::EncasedIndustrialBeam],
+    },
+    RecipeInfo {
+        name: "Stitched Iron Plate",
+        inputs: &[ItemKind::IronPlate, ItemKind::Wire],
+        outputs: &[ItemKind::ReinforcedIronPlate],
+    },
+    RecipeInfo {
+        name: "Bolted Iron Plate",
+        inputs: &[ItemKind::IronPlate, ItemKind::Screw],
+        outputs: &[ItemKind::ReinforcedIronPlate],
+    },
+    RecipeInfo {
+        name: "Radio Connection Unit",
+        inputs: &[ItemKind::HeatSink, ItemKind::HighSpeedConnector, ItemKind::QuartzCrystal],
+        outputs: &[ItemKind::RadioControlUnit],
+    },
+    RecipeInfo {
+        name: "Fused Quickwire",
+        inputs: &[ItemKind::CateriumIngot, ItemKind::CopperIngot],
+        outputs: &[ItemKind::Quickwire],
+    },
+    RecipeInfo {
+        name: "Recycled Plastic",
+        inputs: &[ItemKind::Rubber, ItemKind::Fuel],
+        outputs: &[ItemKind::Plastic],
+    },
+    RecipeInfo {
+        name: "Uranium Fuel Unit",
+        inputs: &[ItemKind::EncasedUraniumCell, ItemKind::ElectromagneticControlRod, ItemKind::CrystalOscillator, ItemKind::Rotor],
+        outputs: &[ItemKind::UraniumFuelRod],
+    },
+    RecipeInfo {
+        name: "Rigor Motor",
+        inputs: &[ItemKind::Rotor, ItemKind::Stator, ItemKind::CrystalOscillator],
+        outputs: &[ItemKind::Motor],
+    },
+    RecipeInfo {
+        name: "Steeled Frame",
+        inputs: &[ItemKind::ReinforcedIronPlate, ItemKind::SteelPipe],
+        outputs: &[ItemKind::ModularFrame],
+    },
+    RecipeInfo {
+        name: "Compacted Steel Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::CompactedCoal],
+        outputs: &[ItemKind::SteelIngot],
+    },
+    RecipeInfo {
+        name: "Solid Steel Ingot",
+        inputs: &[ItemKind::IronIngot, ItemKind::Coal],
+        outputs: &[ItemKind::SteelIngot],
+    },
+    RecipeInfo {
+        name: "Iron Alloy Ingot",
+        inputs: &[ItemKind::IronOre, ItemKind::CopperOre],
+        outputs: &[ItemKind::IronIngot],
+    },
+    RecipeInfo {
+        name: "Silicon High-Speed Connector",
+        inputs: &[ItemKind::Quickwire, ItemKind::Silica, ItemKind::CircuitBoard],
+        outputs: &[ItemKind::HighSpeedConnector],
+    },
+    RecipeInfo {
+        name: "Heavy Encased Frame",
+        inputs: &[ItemKind::ModularFrame, ItemKind::EncasedIndustrialBeam, ItemKind::SteelPipe, ItemKind::Concrete],
+        outputs: &[ItemKind::HeavyModularFrame],
+    },
+    RecipeInfo {
+        name: "Heat Exchanger",
+        inputs: &[ItemKind::AluminumCasing, ItemKind::Rubber],
+        outputs: &[ItemKind::HeatSink],
+    },
+    RecipeInfo {
+        name: "Fine Black Powder",
+        inputs: &[ItemKind::Sulfur, ItemKind::CompactedCoal],
+        outputs: &[ItemKind::BlackPowder],
+    },
+    RecipeInfo {
+        name: "Electromagnetic Connection Rod",
+        inputs: &[ItemKind::Stator, ItemKind::HighSpeedConnector],
+        outputs: &[ItemKind::ElectromagneticControlRod],
+    },
+    RecipeInfo {
+        name: "Insulated Crystal Oscillator",
+        inputs: &[ItemKind::QuartzCrystal, ItemKind::Rubber, ItemKind::AiLimiter],
+        outputs: &[ItemKind::CrystalOscillator],
+    },
+    RecipeInfo {
+        name: "Fine Concrete",
+        inputs: &[ItemKind::Silica, ItemKind::Limestone],
+        outputs: &[ItemKind::Concrete],
+    },
+    RecipeInfo {
+        name: "Crystal Computer",
+        inputs: &[ItemKind::CircuitBoard, ItemKind::CrystalOscillator],
+        outputs: &[ItemKind::Computer],
+    },
+    RecipeInfo {
+        name: "Caterium Computer",
+        inputs: &[ItemKind::CircuitBoard, ItemKind::Quickwire, ItemKind::Rubber],
+        outputs: &[ItemKind::Computer],
+    },
+    RecipeInfo {
+        name: "Caterium Circuit Board",
+        inputs: &[ItemKind::Plastic, ItemKind::Quickwire],
+        outputs: &[ItemKind::CircuitBoard],
+    },
+    RecipeInfo {
+        name: "Silicon Circuit Board",
+        inputs: &[ItemKind::CopperSheet, ItemKind::Silica],
+        outputs: &[ItemKind::CircuitBoard],
+    },
+    RecipeInfo {
+        name: "Quickwire Cable",
+        inputs: &[ItemKind::Quickwire, ItemKind::Rubber],
+        outputs: &[ItemKind::Cable],
+    },
+    RecipeInfo {
+        name: "Insulated Cable",
+        inputs: &[ItemKind::Wire, ItemKind::Rubber],
+        outputs: &[ItemKind::Cable],
+    },
+    RecipeInfo {
+        name: "Ficsonium",
+        inputs: &[ItemKind::PlutoniumWaste, ItemKind::SingularityCell, ItemKind::DarkMatterResidue],
+        outputs: &[ItemKind::Ficsonium],
+    },
+    RecipeInfo {
+        name: "Ficsonium Fuel Rod",
+        inputs: &[ItemKind::Ficsonium, ItemKind::ElectromagneticControlRod, ItemKind::FicsiteTrigon, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::FicsoniumFuelRod, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Singularity Cell",
+        inputs: &[ItemKind::NuclearPasta, ItemKind::DarkMatterCrystal, ItemKind::IronPlate, ItemKind::Concrete],
+        outputs: &[ItemKind::SingularityCell],
+    },
+    RecipeInfo {
+        name: "Ballistic Warp Drive",
+        inputs: &[ItemKind::ThermalPropulsionRocket, ItemKind::SingularityCell, ItemKind::SuperpositionOscillator, ItemKind::DarkMatterCrystal],
+        outputs: &[ItemKind::BallisticWarpDrive],
+    },
+    RecipeInfo {
+        name: "Iodine-Infused Filter",
+        inputs: &[ItemKind::GasFilter, ItemKind::Quickwire, ItemKind::AluminumCasing],
+        outputs: &[ItemKind::IodineInfusedFilter],
+    },
+    RecipeInfo {
+        name: "Quickwire",
+        inputs: &[ItemKind::CateriumIngot],
+        outputs: &[ItemKind::Quickwire],
+    },
+    RecipeInfo {
+        name: "Solid Biofuel",
+        inputs: &[ItemKind::Biomass],
+        outputs: &[ItemKind::SolidBiofuel],
+    },
+    RecipeInfo {
+        name: "Hog Protein",
+        inputs: &[ItemKind::HogRemains],
+        outputs: &[ItemKind::AlienProtein],
+    },
+    RecipeInfo {
+        name: "Spitter Protein",
+        inputs: &[ItemKind::SpitterRemains],
+        outputs: &[ItemKind::AlienProtein],
+    },
+    RecipeInfo {
+        name: "Biomass (Mycelia)",
+        inputs: &[ItemKind::Mycelia],
+        outputs: &[ItemKind::Biomass],
+    },
+    RecipeInfo {
+        name: "Power Shard (1)",
+        inputs: &[ItemKind::BluePowerSlug],
+        outputs: &[ItemKind::PowerShard],
+    },
+    RecipeInfo {
+        name: "Black Powder",
+        inputs: &[ItemKind::Coal, ItemKind::Sulfur],
+        outputs: &[ItemKind::BlackPowder],
+    },
+    RecipeInfo {
+        name: "Alien Power Matrix",
+        inputs: &[ItemKind::SamFluctuator, ItemKind::PowerShard, ItemKind::SuperpositionOscillator, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::AlienPowerMatrix, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Stinger Protein",
+        inputs: &[ItemKind::StingerRemains],
+        outputs: &[ItemKind::AlienProtein],
+    },
+    RecipeInfo {
+        name: "Hatcher Protein",
+        inputs: &[ItemKind::HatcherRemains],
+        outputs: &[ItemKind::AlienProtein],
+    },
+    RecipeInfo {
+        name: "Alien DNA Capsule",
+        inputs: &[ItemKind::AlienProtein],
+        outputs: &[ItemKind::AlienDnaCapsule],
+    },
+    RecipeInfo {
+        name: "Biomass (Alien Protein)",
+        inputs: &[ItemKind::AlienProtein],
+        outputs: &[ItemKind::Biomass],
+    },
+    RecipeInfo {
+        name: "Iron Rebar",
+        inputs: &[ItemKind::IronRod],
+        outputs: &[ItemKind::IronRebar],
+    },
+    RecipeInfo {
+        name: "Homing Rifle Ammo",
+        inputs: &[ItemKind::RifleAmmo, ItemKind::HighSpeedConnector],
+        outputs: &[ItemKind::HomingRifleAmmo],
+    },
+    RecipeInfo {
+        name: "Stun Rebar",
+        inputs: &[ItemKind::IronRebar, ItemKind::Quickwire],
+        outputs: &[ItemKind::StunRebar],
+    },
+    RecipeInfo {
+        name: "Gas Filter",
+        inputs: &[ItemKind::Fabric, ItemKind::Coal, ItemKind::IronPlate],
+        outputs: &[ItemKind::GasFilter],
+    },
+    RecipeInfo {
+        name: "Gas Nobelisk",
+        inputs: &[ItemKind::Nobelisk, ItemKind::Biomass],
+        outputs: &[ItemKind::GasNobelisk],
+    },
+    RecipeInfo {
+        name: "Polyester Fabric",
+        inputs: &[ItemKind::PolymerResin, ItemKind::Water],
+        outputs: &[ItemKind::Fabric],
+    },
+    RecipeInfo {
+        name: "Fabric",
+        inputs: &[ItemKind::Mycelia, ItemKind::Biomass],
+        outputs: &[ItemKind::Fabric],
+    },
+    RecipeInfo {
+        name: "Synthetic Power Shard",
+        inputs: &[ItemKind::TimeCrystal, ItemKind::DarkMatterCrystal, ItemKind::QuartzCrystal, ItemKind::ExcitedPhotonicMatter],
+        outputs: &[ItemKind::PowerShard, ItemKind::DarkMatterResidue],
+    },
+    RecipeInfo {
+        name: "Power Shard (5)",
+        inputs: &[ItemKind::PurplePowerSlug],
+        outputs: &[ItemKind::PowerShard],
+    },
+    RecipeInfo {
+        name: "Power Shard (2)",
+        inputs: &[ItemKind::YellowPowerSlug],
+        outputs: &[ItemKind::PowerShard],
+    },
+    RecipeInfo {
+        name: "Pulse Nobelisk",
+        inputs: &[ItemKind::Nobelisk, ItemKind::CrystalOscillator],
+        outputs: &[ItemKind::PulseNobelisk],
+    },
+    RecipeInfo {
+        name: "Shatter Rebar",
+        inputs: &[ItemKind::IronRebar, ItemKind::QuartzCrystal],
+        outputs: &[ItemKind::ShatterRebar],
+    },
+    RecipeInfo {
+        name: "Turbo Rifle Ammo",
+        inputs: &[ItemKind::RifleAmmo, ItemKind::AluminumCasing, ItemKind::PackagedTurbofuel],
+        outputs: &[ItemKind::TurboRifleAmmo],
+    },
+    RecipeInfo {
+        name: "Turbo Rifle Ammo",
+        inputs: &[ItemKind::RifleAmmo, ItemKind::AluminumCasing, ItemKind::Turbofuel],
+        outputs: &[ItemKind::TurboRifleAmmo],
+    },
+    RecipeInfo {
+        name: "Nuke Nobelisk",
+        inputs: &[ItemKind::Nobelisk, ItemKind::EncasedUraniumCell, ItemKind::SmokelessPowder, ItemKind::AiLimiter],
+        outputs: &[ItemKind::NukeNobelisk],
+    },
+    RecipeInfo {
+        name: "Rifle Ammo",
+        inputs: &[ItemKind::CopperSheet, ItemKind::SmokelessPowder],
+        outputs: &[ItemKind::RifleAmmo],
+    },
+    RecipeInfo {
+        name: "Explosive Rebar",
+        inputs: &[ItemKind::IronRebar, ItemKind::SmokelessPowder, ItemKind::SteelPipe],
+        outputs: &[ItemKind::ExplosiveRebar],
+    },
+    RecipeInfo {
+        name: "Cluster Nobelisk",
+        inputs: &[ItemKind::Nobelisk, ItemKind::SmokelessPowder],
+        outputs: &[ItemKind::ClusterNobelisk],
+    },
+    RecipeInfo {
+        name: "Nobelisk",
+        inputs: &[ItemKind::BlackPowder, ItemKind::SteelPipe],
+        outputs: &[ItemKind::Nobelisk],
+    },
+    RecipeInfo {
+        name: "Smokeless Powder",
+        inputs: &[ItemKind::BlackPowder, ItemKind::HeavyOilResidue],
+        outputs: &[ItemKind::SmokelessPowder],
+    },
+    RecipeInfo {
+        name: "Biomass (Leaves)",
+        inputs: &[ItemKind::Leaves],
+        outputs: &[ItemKind::Biomass],
+    },
+    RecipeInfo {
+        name: "Biomass (Wood)",
+        inputs: &[ItemKind::Wood],
+        outputs: &[ItemKind::Biomass],
+    },
+    RecipeInfo {
+        name: "Reinforced Iron Plate",
+        inputs: &[ItemKind::IronPlate, ItemKind::Screw],
+        outputs: &[ItemKind::ReinforcedIronPlate],
+    },
+    RecipeInfo {
+        name: "Concrete",
+        inputs: &[ItemKind::Limestone],
+        outputs: &[ItemKind::Concrete],
+    },
+    RecipeInfo {
+        name: "Screw",
+        inputs: &[ItemKind::IronRod],
+        outputs: &[ItemKind::Screw],
+    },
+    RecipeInfo {
+        name: "Cable",
+        inputs: &[ItemKind::Wire],
+        outputs: &[ItemKind::Cable],
+    },
+    RecipeInfo {
+        name: "Wire",
+        inputs: &[ItemKind::CopperIngot],
+        outputs: &[ItemKind::Wire],
+    },
+    RecipeInfo {
+        name: "Copper Ingot",
+        inputs: &[ItemKind::CopperOre],
+        outputs: &[ItemKind::CopperIngot],
+    },
+];

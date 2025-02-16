@@ -14,6 +14,8 @@ import { useRef } from "react";
 export type SourceNodeData = NodeData<SourceGraphNode>;
 export type SourceNode = Node<SourceNodeData, "source">;
 
+const MAX_RATE = 131071;
+
 export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNode>) => {
     const { setData, graph } = useStore(useShallow(store => ({
         setData: store.setSourceNodeData,
@@ -101,6 +103,9 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                 <div css={{
                     margin: "8px 0",
                     display: "flex",
+                    flexWrap: "wrap",
+                    width: 230,
+                    justifyContent: "center",
                     gap: 4,
                     "& > button": {
                         background: "#f2f2f2",
@@ -116,7 +121,7 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                         },
                     },
                 }}>
-                    {[30, 60, 120, 240, 480, 960, 1200].map(rate => (
+                    {[30, 60, 120, 240, 300, 480, 600, 960, 1200, 1920, 2400, 4800].map(rate => (
                         <button
                             disabled={rate === node.rate}
                             key={rate}
@@ -129,8 +134,9 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                 </div>
                 <input
                     ref={rateInput}
-                    type="text"
+                    type="number"
                     min="0"
+                    max={MAX_RATE}
                     defaultValue={node.rate}
                     onBeforeInput={(e: React.CompositionEvent<HTMLInputElement>) => {
                         const v = e.data;
@@ -140,10 +146,11 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
                     }}
                     onKeyDown={e => {
                         if (e.key === "Enter") {
-                            updateData({ rate: +e.currentTarget.value })
+                            onRateInputSubmit(e.currentTarget, rate => updateData({ rate }));
                         }
                     }}
-                    onBlur={e => updateData({ rate: +e.target.value })}
+                    onBlur={e => onRateInputSubmit(e.target, rate => updateData({ rate }))}
+                    // onBlur={e => updateData({ rate: +e.target.value })}
                     css={{
                         fontSize: 12,
                         width: 150,
@@ -153,4 +160,15 @@ export const SourceNode = ({ selected, data: { node, id } }: NodeProps<SourceNod
             }
         </div>
     </div>;
+};
+
+const onRateInputSubmit = (target: HTMLInputElement, update: (v: number) => void) => {
+    let n = Number(target.value);
+    if (Number.isNaN(n)) {
+        n = 0;
+    }
+
+    n = Math.min(n, MAX_RATE);
+    update(n);
+    target.value = n.toString();
 };
